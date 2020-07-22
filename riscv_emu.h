@@ -49,6 +49,7 @@ enum Opcode
     EBREAK  //ignored
 };
 
+/*
 //helper function, *regfile should be state->regfile and nothing else
 void reg_write(uint8_t reg, int32_t data, int32_t *regfile)
 {
@@ -69,6 +70,7 @@ int32_t reg_read(uint8_t reg, int32_t *regfile)
     else
         return *(regfile + reg);
 }
+*/
 
 //treat all register data as signed by default,
 //only cast to unsigned as needed
@@ -76,19 +78,18 @@ typedef struct
 {
     uint32_t pc;
     uint32_t pc_next;           //+1 or branch target
-    bool branch;
+    bool branch;                //to branch or not to branch
+    int32_t instr;              //signed, for easy sign extension
     enum Opcode op;
     int32_t imm;                //imm's are always signed
-    int32_t regfile[32];
     uint8_t rs1, rs2, rd;       //addr's of the 2 read, 1 write
                                 //ported regfile
     int32_t rs1_dat, rs2_dat,   //read data from regfile
             rd_dat;             //writeback data from ALU
+    uint32_t mem_addr;          //computed by ALU
     bool write;                 //ALU will write RES or not
-    uint32_t *mem;              //move to seperate struct maybe
+    uint8_t *mem;              //move to seperate struct maybe
     size_t mem_size;            //... ^^
-    void (*reg_write)(uint8_t, int32_t, int32_t *regfile);
-    int32_t (*reg_read)(uint8_t, int32_t *regfile);
 
 } EmulatorState;
 
@@ -101,6 +102,7 @@ EmulatorState* initState()
         state->pc = 0;
         state->pc_next = 0;
         state->branch = false;
+        state->instr = 0x13;    //ADDI 0, 0, 0 - NOP
         state->op = ADDI;
         state->imm = 0;
         state->rs1 = 0;
@@ -109,11 +111,10 @@ EmulatorState* initState()
         state->rs1_dat = 0;
         state->rs2_dat = 0;
         state->rd_dat = 0;
+        state->mem_addr = 0;
         state->write = false;
         state->mem = NULL;
         state->mem_size = 0;
-        state->reg_write = &reg_write;
-        state->reg_read = &reg_read;
     }
     return state;
 }

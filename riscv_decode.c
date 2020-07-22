@@ -3,7 +3,7 @@
 
 void decode(EmulatorState *state){
     
-    int32_t instr = (int32_t) state->mem[state->pc];
+    int32_t instr = state->instr;
 
     if(instr & OPC_U_LUI)
     {
@@ -237,7 +237,7 @@ void decode(EmulatorState *state){
     {
         //NOP - ADDI 0
         state->imm = 0;
-        state->write = true;
+        state->write = false;
         //technically imm_I == (0, 1) selects between ECALL and EBREAK
         //two types of NOP, so don't care
         if(func3(instr) == 0)
