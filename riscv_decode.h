@@ -76,7 +76,7 @@
                         |((instr & MASK_IMM_20)    << 11) \
                         |((instr & MASK_IMM_30_25) <<  5) \
                         |((instr & MASK_IMM_24_21) <<  1))\
-                        << 11) >> 11)
+                        << 11) >> 10)
 
 #define MASK_FUNC3      (0x7    << 12)
 #define MASK_FUNC7      (0x7F   << 25)
