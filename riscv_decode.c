@@ -11,6 +11,7 @@ void decode(EmulatorState *state){
         state->imm = imm_U(instr);
         state->op = LUI;
         state->write = true;
+        state->memory = false;
     }
     else
     if(instr & OPC_U_AUIPC)
@@ -19,6 +20,7 @@ void decode(EmulatorState *state){
         state->imm = imm_U(instr);
         state->op = AUIPC;
         state->write = true;
+        state->memory = false;
     }
     else
     if(instr & OPC_B_BRANCHES)
@@ -27,6 +29,7 @@ void decode(EmulatorState *state){
         state->rs2 = rs2(instr);
         state->imm = imm_B(instr);
         state->write = false;
+        state->memory = false;
         switch(func3(instr))
         {
             case 0:
@@ -61,6 +64,7 @@ void decode(EmulatorState *state){
         state->rs1 = rs1(instr);
         state->imm = imm_I(instr);
         state->write = true;
+        state->memory = true;
         switch(func3(instr))
         {
             case 0:
@@ -91,6 +95,7 @@ void decode(EmulatorState *state){
         state->rs2 = rs2(instr);
         state->imm = imm_S(instr);
         state->write = false;
+        state->memory = true;
         switch(func3(instr))
         {
             case 0:
@@ -113,6 +118,7 @@ void decode(EmulatorState *state){
         state->rs1 = rs1(instr);
         state->imm = imm_I(instr);
         state->write = true;
+        state->memory = false;
         switch(func3(instr))
         {
             case 0:
@@ -162,6 +168,7 @@ void decode(EmulatorState *state){
         state->rs1 = rs1(instr);
         state->rs2 = rs2(instr);
         state->write = true;
+        state->memory = false;
         switch(func3(instr))
         {
             case 0:
@@ -210,6 +217,7 @@ void decode(EmulatorState *state){
         state->imm = imm_J(instr);
         state->write = true;
         state->op = JAL;
+        state->memory = false;
     }
     else
     if(instr & OPC_I_JALR)
@@ -218,6 +226,7 @@ void decode(EmulatorState *state){
         state->rs1 = rs1(instr);
         state->imm = imm_I(instr);
         state->write = true;
+        state->memory = false;
         if(func3(instr) == 0) //TODO: add trap for invalid instructions
             state->op = JALR;
     }
@@ -229,6 +238,7 @@ void decode(EmulatorState *state){
         state->rs1 = rs1(instr);
         state->imm = 0;
         state->write = true;
+        state->memory = false;
         if(func3(instr) == 0)
             state->op = ADDI;
     }
@@ -238,6 +248,7 @@ void decode(EmulatorState *state){
         //NOP - ADDI 0
         state->imm = 0;
         state->write = false;
+        state->memory = false;
         //technically imm_I == (0, 1) selects between ECALL and EBREAK
         //two types of NOP, so don't care
         if(func3(instr) == 0)

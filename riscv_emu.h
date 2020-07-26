@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 enum Opcode
 {
@@ -77,7 +78,7 @@ int32_t reg_read(uint8_t reg, int32_t *regfile)
 typedef struct
 {
     uint32_t pc;
-    uint32_t pc_next;           //+1 or branch target
+    uint32_t branch_target;     //computed by ALU
     bool branch;                //to branch or not to branch
     int32_t instr;              //signed, for easy sign extension
     enum Opcode op;
@@ -88,7 +89,8 @@ typedef struct
             rd_dat;             //writeback data from ALU
     uint32_t mem_addr;          //computed by ALU
     bool write;                 //ALU will write RES or not
-    uint8_t *mem;              //move to seperate struct maybe
+    bool memory;                //memory access flag
+    uint8_t *mem;               //move to seperate struct maybe
     size_t mem_size;            //... ^^
 
 } EmulatorState;
@@ -100,7 +102,7 @@ EmulatorState* initState()
     if(state != NULL)
     {
         state->pc = 0;
-        state->pc_next = 0;
+        state->branch_target = 0;
         state->branch = false;
         state->instr = 0x13;    //ADDI 0, 0, 0 - NOP
         state->op = ADDI;
@@ -113,6 +115,7 @@ EmulatorState* initState()
         state->rd_dat = 0;
         state->mem_addr = 0;
         state->write = false;
+        state->memory = false;
         state->mem = NULL;
         state->mem_size = 0;
     }

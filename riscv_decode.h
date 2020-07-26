@@ -65,7 +65,7 @@
                         |((instr & MASK_IMM_7)     << 11) \
                         |((instr & MASK_IMM_30_25) <<  5) \
                         |((instr & MASK_IMM_11_8)  <<  1))\
-                        << 19) >> 19)
+                        << 19) >> 18)
 
 #define imm_U(instr) (   ((instr & MASK_IMM_31)    << 31) \
                         |((instr & MASK_IMM_30_20) << 20) \
