@@ -1,258 +1,266 @@
 #include "riscv_emu.h"
 #include "riscv_decode.h"
 
-void decode(EmulatorState *state){
-    
-    int32_t instr = state->instr;
+#define _instr state->instr
+#define _rd state->rd
+#define _rs1 state->rs1
+#define _rs2 state->rs2
+#define _imm state->imm
+#define _op state->op
+#define _write state->write
+#define _memory state->memory
 
-    if(instr & OPC_U_LUI)
+
+void decode(EmulatorState *state){
+
+    if(_instr & OPC_U_LUI)
     {
-        state->rd = rd(instr);
-        state->imm = imm_U(instr);
-        state->op = LUI;
-        state->write = true;
-        state->memory = false;
+        _rd = rd(_instr);
+        _imm = imm_U(_instr);
+        _op = LUI;
+        _write = true;
+        _memory = false;
     }
     else
-    if(instr & OPC_U_AUIPC)
+    if(_instr & OPC_U_AUIPC)
     {
-        state->rd = rd(instr);
-        state->imm = imm_U(instr);
-        state->op = AUIPC;
-        state->write = true;
-        state->memory = false;
+        _rd = rd(_instr);
+        _imm = imm_U(_instr);
+        _op = AUIPC;
+        _write = true;
+        _memory = false;
     }
     else
-    if(instr & OPC_B_BRANCHES)
+    if(_instr & OPC_B_BRANCHES)
     {
-        state->rs1 = rs1(instr);
-        state->rs2 = rs2(instr);
-        state->imm = imm_B(instr);
-        state->write = false;
-        state->memory = false;
-        switch(func3(instr))
+        _rs1 = rs1(_instr);
+        _rs2 = rs2(_instr);
+        _imm = imm_B(_instr);
+        _write = false;
+        _memory = false;
+        switch(func3(_instr))
         {
             case 0:
-                state->op = BEQ;
+                _op = BEQ;
                 break;
 
             case 1:
-                state->op = BNE;
+                _op = BNE;
                 break;
 
             case 4:
-                state->op = BLT;
+                _op = BLT;
                 break;
 
             case 5:
-                state->op = BGE;
+                _op = BGE;
                 break;
 
             case 6:
-                state->op = BLTU;
+                _op = BLTU;
                 break;
 
             case 7:
-                state->op = BGEU;
+                _op = BGEU;
                 break;
         }
     }
     else
-    if(instr & OPC_I_LOADS)
+    if(_instr & OPC_I_LOADS)
     {
-        state->rd = rd(instr);
-        state->rs1 = rs1(instr);
-        state->imm = imm_I(instr);
-        state->write = true;
-        state->memory = true;
-        switch(func3(instr))
+        _rd = rd(_instr);
+        _rs1 = rs1(_instr);
+        _imm = imm_I(_instr);
+        _write = true;
+        _memory = true;
+        switch(func3(_instr))
         {
             case 0:
-                state->op = LB;
+                _op = LB;
                 break;
 
             case 1:
-                state->op = LH;
+                _op = LH;
                 break;
 
             case 2:
-                state->op = LW;
+                _op = LW;
                 break;
 
             case 4:
-                state->op = LBU;
+                _op = LBU;
                 break;
 
             case 5:
-                state->op = LHU;
+                _op = LHU;
                 break;
         }
     }
     else
-    if(instr & OPC_S_STORES)
+    if(_instr & OPC_S_STORES)
     {
-        state->rs1 = rs1(instr);
-        state->rs2 = rs2(instr);
-        state->imm = imm_S(instr);
-        state->write = false;
-        state->memory = true;
-        switch(func3(instr))
+        _rs1 = rs1(_instr);
+        _rs2 = rs2(_instr);
+        _imm = imm_S(_instr);
+        _write = false;
+        _memory = true;
+        switch(func3(_instr))
         {
             case 0:
-                state->op = SB;
+                _op = SB;
                 break;
 
             case 1:
-                state->op = SH;
+                _op = SH;
                 break;
 
             case 2:
-                state->op = SW;
+                _op = SW;
                 break;
         }
     }
     else
-    if(instr & OPC_I_REGIMM)
+    if(_instr & OPC_I_REGIMM)
     {
-        state->rd = rd(instr);
-        state->rs1 = rs1(instr);
-        state->imm = imm_I(instr);
-        state->write = true;
-        state->memory = false;
-        switch(func3(instr))
+        _rd = rd(_instr);
+        _rs1 = rs1(_instr);
+        _imm = imm_I(_instr);
+        _write = true;
+        _memory = false;
+        switch(func3(_instr))
         {
             case 0:
-                state->op = ADDI;
+                _op = ADDI;
                 break;
 
             case 2:
-                state->op = SLTI;
+                _op = SLTI;
                 break;
 
             case 3:
-                state->op = SLTIU;
+                _op = SLTIU;
                 break;
 
             case 4:
-                state->op = XORI;
+                _op = XORI;
                 break;
 
             case 6:
-                state->op = ORI;
+                _op = ORI;
                 break;
 
             case 7:
-                state->op = ANDI;
+                _op = ANDI;
                 break;
 
             //shifts
             //re-use rs2-macro to overwrite imm, not pretty but works
             case 1:
-                state->op = SLLI;
-                state->imm = rs2(instr);
+                _op = SLLI;
+                _imm = rs2(_instr);
                 break;
 
             case 5:
-                if(instr & MASK_FUNC7)
-                    state->op = SRLI;
+                if(_instr & MASK_FUNC7)
+                    _op = SRLI;
                 else
-                    state->op = SRAI;
-                state->imm = rs2(instr);
+                    _op = SRAI;
+                _imm = rs2(_instr);
                 break;
         }
     }
     else
-    if(instr & OPC_R_REGREG)
+    if(_instr & OPC_R_REGREG)
     {
-        state->rd = rd(instr);
-        state->rs1 = rs1(instr);
-        state->rs2 = rs2(instr);
-        state->write = true;
-        state->memory = false;
-        switch(func3(instr))
+        _rd = rd(_instr);
+        _rs1 = rs1(_instr);
+        _rs2 = rs2(_instr);
+        _write = true;
+        _memory = false;
+        switch(func3(_instr))
         {
             case 0:
-                if(instr & MASK_FUNC7)
-                    state->op = SUB;
+                if(_instr & MASK_FUNC7)
+                    _op = SUB;
                 else
-                    state->op = ADD;
+                    _op = ADD;
                 break;
 
             case 1:
-                state->op = SLL;
+                _op = SLL;
                 break;
 
             case 2:
-                state->op = SLT;
+                _op = SLT;
                 break;
 
             case 3:
-                state->op = SLTU;
+                _op = SLTU;
                 break;
 
             case 4:
-                state->op = XOR;
+                _op = XOR;
                 break;
 
             case 5:
-                if(instr & MASK_FUNC7)
-                    state->op = SRA;
+                if(_instr & MASK_FUNC7)
+                    _op = SRA;
                 else
-                    state->op = SRL;
+                    _op = SRL;
                 break;
 
             case 6:
-                state->op = OR;
+                _op = OR;
                 break;
 
             case 7:
-                state->op = AND;
+                _op = AND;
                 break;
         }
     }
     else
-    if(instr & OPC_J_JAL)
+    if(_instr & OPC_J_JAL)
     {
-        state->rd = rd(instr);
-        state->imm = imm_J(instr);
-        state->write = true;
-        state->op = JAL;
-        state->memory = false;
+        _rd = rd(_instr);
+        _imm = imm_J(_instr);
+        _write = true;
+        _op = JAL;
+        _memory = false;
     }
     else
-    if(instr & OPC_I_JALR)
+    if(_instr & OPC_I_JALR)
     {
-        state->rd = rd(instr);
-        state->rs1 = rs1(instr);
-        state->imm = imm_I(instr);
-        state->write = true;
-        state->memory = false;
-        if(func3(instr) == 0) //TODO: add trap for invalid instructions
-            state->op = JALR;
+        _rd = rd(_instr);
+        _rs1 = rs1(_instr);
+        _imm = imm_I(_instr);
+        _write = true;
+        _memory = false;
+        if(func3(_instr) == 0) //TODO: add trap for invalid _instructions
+            _op = JALR;
     }
     else
-    if(instr & OPC_I_FENCE)
+    if(_instr & OPC_I_FENCE)
     {
         //NOP - ADDI 0
-        state->rd = rd(instr);
-        state->rs1 = rs1(instr);
-        state->imm = 0;
-        state->write = true;
-        state->memory = false;
-        if(func3(instr) == 0)
-            state->op = ADDI;
+        _rd = rd(_instr);
+        _rs1 = rs1(_instr);
+        _imm = 0;
+        _write = true;
+        _memory = false;
+        if(func3(_instr) == 0)
+            _op = ADDI;
     }
     else
-    if(instr & OPC_I_ENV)
+    if(_instr & OPC_I_ENV)
     {
         //NOP - ADDI 0
-        state->imm = 0;
-        state->write = false;
-        state->memory = false;
+        _imm = 0;
+        _write = false;
+        _memory = false;
         //technically imm_I == (0, 1) selects between ECALL and EBREAK
         //two types of NOP, so don't care
-        if(func3(instr) == 0)
-            state->op = ADDI;
+        if(func3(_instr) == 0)
+            _op = ADDI;
     }
     return;
 }
