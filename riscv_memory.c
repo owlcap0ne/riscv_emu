@@ -9,7 +9,7 @@ static void write_mem_word(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint32_t) > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     uint32_t *int_ptr = (uint32_t*) _mem + _mem_addr;
@@ -21,7 +21,7 @@ static void write_mem_half(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     uint16_t *half_ptr = (uint16_t*) _mem + _mem_addr;
@@ -33,7 +33,7 @@ static void write_mem_byte(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     uint8_t *byte_ptr = (uint8_t*) _mem + _mem_addr;
@@ -45,7 +45,7 @@ static void read_mem_word(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint32_t) > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     _rd_dat = *((uint32_t*) (_mem + _mem_addr));
@@ -56,7 +56,7 @@ static void read_mem_half(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     _rd_dat = (*((int16_t*) (_mem + _mem_addr)) << 16 >> 16);
@@ -67,7 +67,7 @@ static void read_mem_halfu(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     _rd_dat = *((uint16_t*) (_mem + _mem_addr));
@@ -78,7 +78,7 @@ static void read_mem_byte(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     _rd_dat = (*((int8_t*) (_mem + _mem_addr)) << 24 >> 24);
@@ -89,7 +89,7 @@ static void read_mem_byteu(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
-        printf("ERROR: invalid memory address: %x\n", _mem_addr);
+        printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
     _rd_dat = *((uint8_t*) (_mem + _mem_addr));
