@@ -50,26 +50,26 @@
 //signed (int32_t plz...) shifting the 31st bit into position should
 //result in automatic sign extension
 
-#define imm_I(instr)    (((instr & MASK_IMM_31)    >> 20) \
+#define IMM_I(instr)    (((instr & MASK_IMM_31)    >> 20) \
                         |((instr & MASK_IMM_30_25) >> 20) \
                         |((instr & MASK_IMM_24_21) >> 20) \
                         |((instr & MASK_IMM_20)    >> 20))
 
-#define imm_S(instr)    (((instr & MASK_IMM_31)    >> 20) \
+#define IMM_S(instr)    (((instr & MASK_IMM_31)    >> 20) \
                         |((instr & MASK_IMM_30_25) >> 20) \
                         |((instr & MASK_IMM_11_8)  >>  7) \
                         |((instr & MASK_IMM_7)     >>  7))
 
-#define imm_B(instr)    (((instr & MASK_IMM_31)    >> 19) \
+#define IMM_B(instr)    (((instr & MASK_IMM_31)    >> 19) \
                         |((instr & MASK_IMM_7)     >>  4) \
                         |((instr & MASK_IMM_30_25) <<  4) \
                         |((instr & MASK_IMM_11_8)  >>  7))
 
-#define imm_U(instr)    ((instr & MASK_IMM_31)    \
+#define IMM_U(instr)    ((instr & MASK_IMM_31)    \
                         |(instr & MASK_IMM_30_20) \
                         |(instr & MASK_IMM_19_12))
 
-#define imm_J(instr)    (((instr & MASK_IMM_31)    >> 11) \
+#define IMM_J(instr)    (((instr & MASK_IMM_31)    >> 11) \
                         |((instr & MASK_IMM_19_12) >> 12) \
                         |((instr & MASK_IMM_20)    >>  9) \
                         |((instr & MASK_IMM_30_25) >> 20) \
@@ -82,12 +82,12 @@
 #define MASK_RD         (0x1F   <<  7)
 #define MASK_OP         (0x7F)
 
-#define func3(instr) ((instr & MASK_FUNC3) >> 12)
-#define func7(instr) (((uint32_t)instr & MASK_FUNC7) >> 25) //avoid sign extension here...
-#define rs1(instr)   ((instr & MASK_RS1)   >> 15)
-#define rs2(instr)   ((instr & MASK_RS2)   >> 20)
-#define rd(instr)    ((instr & MASK_RD)    >>  7)
-#define op(instr)     (instr & MASK_OP)
+#define FUNC3(instr) ((instr & MASK_FUNC3) >> 12)
+#define FUNC7(instr) (((uint32_t)instr & MASK_FUNC7) >> 25) //avoid sign extension here...
+#define RS1(instr)   ((instr & MASK_RS1)   >> 15)
+#define RS2(instr)   ((instr & MASK_RS2)   >> 20)
+#define RD(instr)    ((instr & MASK_RD)    >>  7)
+#define OP(instr)     (instr & MASK_OP)
 
 //opcodes
 #define OPC_B_BRANCHES  0x63

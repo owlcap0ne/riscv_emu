@@ -13,43 +13,43 @@
 
 void decode(EmulatorState *state){
 
-    uint8_t op_tmp = op(_instr);
-    uint8_t rd_tmp = rd(_instr);
-    uint8_t rs1_tmp = rs1(_instr);
-    uint8_t rs2_tmp = rs2(_instr);
-    uint8_t func3_tmp = func3(_instr);
-    uint8_t func7_tmp = func7(_instr);
-    int32_t imm_I_tmp = imm_I(_instr);
-    int32_t imm_S_tmp = imm_S(_instr);
-    int32_t imm_B_tmp = imm_B(_instr);
-    int32_t imm_U_tmp = imm_U(_instr);
-    int32_t imm_J_tmp = imm_J(_instr);
-    if(op_tmp == OPC_U_LUI)
+    uint8_t op = OP(_instr);
+    uint8_t rd_tmp = RD(_instr);
+    uint8_t rs1_tmp = RS1(_instr);
+    uint8_t rs2_tmp = RS2(_instr);
+    uint8_t func3 = FUNC3(_instr);
+    uint8_t func7 = FUNC7(_instr);
+    int32_t imm_I_tmp = IMM_I(_instr);
+    int32_t imm_S_tmp = IMM_S(_instr);
+    int32_t imm_B_tmp = IMM_B(_instr);
+    int32_t imm_U_tmp = IMM_U(_instr);
+    int32_t imm_J_tmp = IMM_J(_instr);
+    if(op == OPC_U_LUI)
     {
-        _rd = rd(_instr);
-        _imm = imm_U(_instr);
+        _rd = RD(_instr);
+        _imm = IMM_U(_instr);
         _op = LUI;
         _write = true;
         _memory = false;
     }
     else
-    if(op_tmp == OPC_U_AUIPC)
+    if(op == OPC_U_AUIPC)
     {
-        _rd = rd(_instr);
-        _imm = imm_U(_instr);
+        _rd = RD(_instr);
+        _imm = IMM_U(_instr);
         _op = AUIPC;
         _write = true;
         _memory = false;
     }
     else
-    if(op_tmp == OPC_B_BRANCHES)
+    if(op == OPC_B_BRANCHES)
     {
-        _rs1 = rs1(_instr);
-        _rs2 = rs2(_instr);
-        _imm = imm_B(_instr);
+        _rs1 = RS1(_instr);
+        _rs2 = RS2(_instr);
+        _imm = IMM_B(_instr);
         _write = false;
         _memory = false;
-        switch(func3(_instr))
+        switch(func3)
         {
             case 0:
                 _op = BEQ;
@@ -77,14 +77,14 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(op_tmp == OPC_I_LOADS)
+    if(op == OPC_I_LOADS)
     {
-        _rd = rd(_instr);
-        _rs1 = rs1(_instr);
-        _imm = imm_I(_instr);
+        _rd = RD(_instr);
+        _rs1 = RS1(_instr);
+        _imm = IMM_I(_instr);
         _write = true;
         _memory = true;
-        switch(func3(_instr))
+        switch(func3)
         {
             case 0:
                 _op = LB;
@@ -108,14 +108,14 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(op_tmp == OPC_S_STORES)
+    if(op == OPC_S_STORES)
     {
-        _rs1 = rs1(_instr);
-        _rs2 = rs2(_instr);
-        _imm = imm_S(_instr);
+        _rs1 = RS1(_instr);
+        _rs2 = RS2(_instr);
+        _imm = IMM_S(_instr);
         _write = false;
         _memory = true;
-        switch(func3(_instr))
+        switch(func3)
         {
             case 0:
                 _op = SB;
@@ -131,14 +131,14 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(op_tmp == OPC_I_REGIMM)
+    if(op == OPC_I_REGIMM)
     {
-        _rd = rd(_instr);
-        _rs1 = rs1(_instr);
-        _imm = imm_I(_instr);
+        _rd = RD(_instr);
+        _rs1 = RS1(_instr);
+        _imm = IMM_I(_instr);
         _write = true;
         _memory = false;
-        switch(func3(_instr))
+        switch(func3)
         {
             case 0:
                 _op = ADDI;
@@ -168,30 +168,30 @@ void decode(EmulatorState *state){
             //re-use rs2-macro to overwrite imm, not pretty but works
             case 1:
                 _op = SLLI;
-                _imm = rs2(_instr);
+                _imm = RS2(_instr);
                 break;
 
             case 5:
-                if(_instr & MASK_FUNC7)
+                if(func7)
                     _op = SRLI;
                 else
                     _op = SRAI;
-                _imm = rs2(_instr);
+                _imm = RS2(_instr);
                 break;
         }
     }
     else
-    if(op_tmp == OPC_R_REGREG)
+    if(op == OPC_R_REGREG)
     {
-        _rd = rd(_instr);
-        _rs1 = rs1(_instr);
-        _rs2 = rs2(_instr);
+        _rd = RD(_instr);
+        _rs1 = RS1(_instr);
+        _rs2 = RS2(_instr);
         _write = true;
         _memory = false;
-        switch(func3(_instr))
+        switch(func3)
         {
             case 0:
-                if(_instr & MASK_FUNC7)
+                if(func7)
                     _op = SUB;
                 else
                     _op = ADD;
@@ -214,7 +214,7 @@ void decode(EmulatorState *state){
                 break;
 
             case 5:
-                if(_instr & MASK_FUNC7)
+                if(func7)
                     _op = SRA;
                 else
                     _op = SRL;
@@ -230,39 +230,39 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(op_tmp == OPC_J_JAL)
+    if(op == OPC_J_JAL)
     {
-        _rd = rd(_instr);
-        _imm = imm_J(_instr);
+        _rd = RD(_instr);
+        _imm = IMM_J(_instr);
         _write = true;
         _op = JAL;
         _memory = false;
     }
     else
-    if(op_tmp == OPC_I_JALR)
+    if(op == OPC_I_JALR)
     {
-        _rd = rd(_instr);
-        _rs1 = rs1(_instr);
-        _imm = imm_I(_instr);
+        _rd = RD(_instr);
+        _rs1 = RS1(_instr);
+        _imm = IMM_I(_instr);
         _write = true;
         _memory = false;
-        if(func3(_instr) == 0) //TODO: add trap for invalid _instructions
+        if(func3 == 0) //TODO: add trap for invalid _instructions
             _op = JALR;
     }
     else
-    if(op_tmp == OPC_I_FENCE)
+    if(op == OPC_I_FENCE)
     {
         //NOP - ADDI 0
-        _rd = rd(_instr);
-        _rs1 = rs1(_instr);
+        _rd = RD(_instr);
+        _rs1 = RS1(_instr);
         _imm = 0;
         _write = true;
         _memory = false;
-        if(func3(_instr) == 0)
+        if(func3 == 0)
             _op = ADDI;
     }
     else
-    if(op_tmp == OPC_I_ENV)
+    if(op == OPC_I_ENV)
     {
         //NOP - ADDI 0
         _imm = 0;
@@ -270,7 +270,7 @@ void decode(EmulatorState *state){
         _memory = false;
         //technically imm_I == (0, 1) selects between ECALL and EBREAK
         //two types of NOP, so don't care
-        if(func3(_instr) == 0)
+        if(func3 == 0)
             _op = ADDI;
     }
     return;
