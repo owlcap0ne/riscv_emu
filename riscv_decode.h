@@ -46,37 +46,34 @@
 
 
 //Welcome to macro hell!
-//puzzle together imm's from components, then shift left until the sign bit is in the MSB position,
-//shift right again to sign extend, assuming the input type is a signed int (int32_t plz...)
+//puzzle together imm's from components, assuming the input type is
+//signed (int32_t plz...) shifting the 31st bit into position should
+//result in automatic sign extension
 
-#define imm_I(instr) ( ((((instr & MASK_IMM_31)    << 11) \
-                        |((instr & MASK_IMM_30_25) <<  5) \
-                        |((instr & MASK_IMM_24_21) <<  1) \
-                        | (instr & MASK_IMM_20)) \
-                        << 20) >> 20)
+#define imm_I(instr)    (((instr & MASK_IMM_31)    >> 20) \
+                        |((instr & MASK_IMM_30_25) >> 20) \
+                        |((instr & MASK_IMM_24_21) >> 20) \
+                        |((instr & MASK_IMM_20)    >> 20))
 
-#define imm_S(instr) ( ((((instr & MASK_IMM_31)    << 11) \
-                        |((instr & MASK_IMM_30_25) <<  5) \
-                        |((instr & MASK_IMM_11_8)  <<  1) \
-                        | (instr & MASK_IMM_7)) \
-                        << 20) >> 20)
+#define imm_S(instr)    (((instr & MASK_IMM_31)    >> 20) \
+                        |((instr & MASK_IMM_30_25) >> 20) \
+                        |((instr & MASK_IMM_11_8)  >>  7) \
+                        |((instr & MASK_IMM_7)     >>  7))
 
-#define imm_B(instr) ( ((((instr & MASK_IMM_31)    << 12) \
-                        |((instr & MASK_IMM_7)     << 11) \
-                        |((instr & MASK_IMM_30_25) <<  5) \
-                        |((instr & MASK_IMM_11_8)  <<  1))\
-                        << 19) >> 18)
+#define imm_B(instr)    (((instr & MASK_IMM_31)    >> 19) \
+                        |((instr & MASK_IMM_7)     >>  4) \
+                        |((instr & MASK_IMM_30_25) <<  4) \
+                        |((instr & MASK_IMM_11_8)  >>  7))
 
-#define imm_U(instr) (   ((instr & MASK_IMM_31)    << 31) \
-                        |((instr & MASK_IMM_30_20) << 20) \
-                        |((instr & MASK_IMM_19_12) << 12))
+#define imm_U(instr)    ((instr & MASK_IMM_31)    \
+                        |(instr & MASK_IMM_30_20) \
+                        |(instr & MASK_IMM_19_12))
 
-#define imm_J(instr) ( ((((instr & MASK_IMM_31)    << 20) \
-                        |((instr & MASK_IMM_19_12) << 12) \
-                        |((instr & MASK_IMM_20)    << 11) \
-                        |((instr & MASK_IMM_30_25) <<  5) \
-                        |((instr & MASK_IMM_24_21) <<  1))\
-                        << 11) >> 10)
+#define imm_J(instr)    (((instr & MASK_IMM_31)    >> 11) \
+                        |((instr & MASK_IMM_19_12) >> 12) \
+                        |((instr & MASK_IMM_20)    >>  9) \
+                        |((instr & MASK_IMM_30_25) >> 20) \
+                        |((instr & MASK_IMM_24_21) >> 20))
 
 #define MASK_FUNC3      (0x7    << 12)
 #define MASK_FUNC7      (0x7F   << 25)
@@ -86,7 +83,7 @@
 #define MASK_OP         (0x7F)
 
 #define func3(instr) ((instr & MASK_FUNC3) >> 12)
-#define func7(instr) ((instr & MASK_FUNC7) >> 25)
+#define func7(instr) (((uint32_t)instr & MASK_FUNC7) >> 25) //avoid sign extension here...
 #define rs1(instr)   ((instr & MASK_RS1)   >> 15)
 #define rs2(instr)   ((instr & MASK_RS2)   >> 20)
 #define rd(instr)    ((instr & MASK_RD)    >>  7)
