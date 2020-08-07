@@ -32,6 +32,7 @@ void execute(EmulatorState* state)
         case JALR:
             _rd_dat = _pc + 4;
             _branch_target = (_rs1_dat + _imm) & 0xFFFFFFFE; //delete LSB
+            _branch = true;
             break;
 
 

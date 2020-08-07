@@ -83,22 +83,35 @@
 #define MASK_RS1        (0x1F   << 15)
 #define MASK_RS2        (0x1F   << 20)
 #define MASK_RD         (0x1F   <<  7)
+#define MASK_OP         (0x7F)
 
 #define func3(instr) ((instr & MASK_FUNC3) >> 12)
 #define func7(instr) ((instr & MASK_FUNC7) >> 25)
-#define rs1(instr)   ((uint8_t)(instr & MASK_RS1)   >> 15)
-#define rs2(instr)   ((uint8_t)(instr & MASK_RS2)   >> 20)
-#define rd(instr)    ((uint8_t)(instr & MASK_RD)    >>  7)
+#define rs1(instr)   ((instr & MASK_RS1)   >> 15)
+#define rs2(instr)   ((instr & MASK_RS2)   >> 20)
+#define rd(instr)    ((instr & MASK_RD)    >>  7)
+#define op(instr)     (instr & MASK_OP)
 
 //opcodes
-#define OPC_B_BRANCHES  0b1100011
-#define OPC_I_LOADS     0b0000011
-#define OPC_S_STORES    0b0100011
-#define OPC_I_REGIMM    0b0010011
-#define OPC_R_REGREG    0b0110011
-#define OPC_U_LUI       0b0110111
-#define OPC_U_AUIPC     0b0010111
-#define OPC_J_JAL       0b1101111
-#define OPC_I_JALR      0b1100111
-#define OPC_I_FENCE     0b0001111
-#define OPC_I_ENV       0b1110011
+#define OPC_B_BRANCHES  0x63
+//0b1100011
+#define OPC_I_LOADS     0x03
+//0b0000011
+#define OPC_S_STORES    0x23
+//0b0100011
+#define OPC_I_REGIMM    0x13
+//0b0010011
+#define OPC_R_REGREG    0x33
+//0b0110011
+#define OPC_U_LUI       0x37
+//0b0110111
+#define OPC_U_AUIPC     0x17
+//0b0010111
+#define OPC_J_JAL       0x6F
+//0b1101111
+#define OPC_I_JALR      0x67
+//0b1100111
+#define OPC_I_FENCE     0x0F
+//0b0001111
+#define OPC_I_ENV       0x73
+//0b1110011

@@ -13,7 +13,18 @@
 
 void decode(EmulatorState *state){
 
-    if(_instr & OPC_U_LUI)
+    uint8_t op_tmp = op(_instr);
+    uint8_t rd_tmp = rd(_instr);
+    uint8_t rs1_tmp = rs1(_instr);
+    uint8_t rs2_tmp = rs2(_instr);
+    uint8_t func3_tmp = func3(_instr);
+    uint8_t func7_tmp = func7(_instr);
+    int32_t imm_I_tmp = imm_I(_instr);
+    int32_t imm_S_tmp = imm_S(_instr);
+    int32_t imm_B_tmp = imm_B(_instr);
+    int32_t imm_U_tmp = imm_U(_instr);
+    int32_t imm_J_tmp = imm_J(_instr);
+    if(op_tmp == OPC_U_LUI)
     {
         _rd = rd(_instr);
         _imm = imm_U(_instr);
@@ -22,7 +33,7 @@ void decode(EmulatorState *state){
         _memory = false;
     }
     else
-    if(_instr & OPC_U_AUIPC)
+    if(op_tmp == OPC_U_AUIPC)
     {
         _rd = rd(_instr);
         _imm = imm_U(_instr);
@@ -31,7 +42,7 @@ void decode(EmulatorState *state){
         _memory = false;
     }
     else
-    if(_instr & OPC_B_BRANCHES)
+    if(op_tmp == OPC_B_BRANCHES)
     {
         _rs1 = rs1(_instr);
         _rs2 = rs2(_instr);
@@ -66,7 +77,7 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(_instr & OPC_I_LOADS)
+    if(op_tmp == OPC_I_LOADS)
     {
         _rd = rd(_instr);
         _rs1 = rs1(_instr);
@@ -97,7 +108,7 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(_instr & OPC_S_STORES)
+    if(op_tmp == OPC_S_STORES)
     {
         _rs1 = rs1(_instr);
         _rs2 = rs2(_instr);
@@ -120,7 +131,7 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(_instr & OPC_I_REGIMM)
+    if(op_tmp == OPC_I_REGIMM)
     {
         _rd = rd(_instr);
         _rs1 = rs1(_instr);
@@ -170,7 +181,7 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(_instr & OPC_R_REGREG)
+    if(op_tmp == OPC_R_REGREG)
     {
         _rd = rd(_instr);
         _rs1 = rs1(_instr);
@@ -219,7 +230,7 @@ void decode(EmulatorState *state){
         }
     }
     else
-    if(_instr & OPC_J_JAL)
+    if(op_tmp == OPC_J_JAL)
     {
         _rd = rd(_instr);
         _imm = imm_J(_instr);
@@ -228,7 +239,7 @@ void decode(EmulatorState *state){
         _memory = false;
     }
     else
-    if(_instr & OPC_I_JALR)
+    if(op_tmp == OPC_I_JALR)
     {
         _rd = rd(_instr);
         _rs1 = rs1(_instr);
@@ -239,7 +250,7 @@ void decode(EmulatorState *state){
             _op = JALR;
     }
     else
-    if(_instr & OPC_I_FENCE)
+    if(op_tmp == OPC_I_FENCE)
     {
         //NOP - ADDI 0
         _rd = rd(_instr);
@@ -251,7 +262,7 @@ void decode(EmulatorState *state){
             _op = ADDI;
     }
     else
-    if(_instr & OPC_I_ENV)
+    if(op_tmp == OPC_I_ENV)
     {
         //NOP - ADDI 0
         _imm = 0;

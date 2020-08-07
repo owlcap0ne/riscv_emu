@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
-int hexread(EmulatorState* state, FILE* hexfile)
+int hexread(EmulatorState* state, const char* hexfile)
 {
-    FILE *fp = fopen("test.hex", "r");
+    FILE *fp = fopen(hexfile, "r");
     if(fp == NULL)
     {
         perror("Unable to open File");
@@ -42,6 +42,9 @@ int hexread(EmulatorState* state, FILE* hexfile)
         strncpy(hex_type, chunk +7, 2);
         len = (unsigned char) strtol(hex_len, &endptr, 16);
         sum = len;
+        strncpy(hex_chksum, chunk +9+(len*2), 2);
+        hex_chksum[2] = 0; //just in case
+        chksum = (unsigned char) strtol(hex_chksum, &endptr, 16);
         type = (unsigned char) strtol(hex_type, &endptr, 16);
         sum += type;
         addr = (unsigned int) strtol(hex_addr, &endptr, 16);
@@ -51,45 +54,55 @@ int hexread(EmulatorState* state, FILE* hexfile)
         switch(type)
         {
             case 0x0: // data
-                base_addr += addr;
+                addr = addr + base_addr;
                 for(int n = 0; n < len*2; n += 2)
                 {
-                    base_addr += n/2;
-                    if(base_addr > state->mem_size)
+                    if(addr > state->mem_size)
                     {
                         return -1;
                     }
                     strncpy(hex_data, chunk +9+n, 2);
                     data = (unsigned char) strtol(hex_data, &endptr, 16);
                     sum += data;
-                    state->mem[base_addr] = data;
+                    state->mem[addr] = data;
+                    addr++;
                 }
 
-                sum = ((!sum) & 0xFF) -1; // 2's complement of LSB
-                if((unsigned char)sum != chksum)
+                if((unsigned char) ((~sum & 0xFF) +1) != chksum)
                 {
                     return -1;
-                }
-                else
-                {
-                    return 0;
                 }
             break;
 
             case 0x1: // EOF
-                sum = ((!sum) & 0xFF) -1;
+                sum = ((~sum) & 0xFF) +1;
                 if((unsigned char) sum != chksum)
                 {
                     return -1;
                 }
-                else
-                {
-                    return 0;
-                }
             break;
 
             case 0x2: // extended segment addr
-                
+              // sanity check
+              if(len != 0x02)
+              {
+                return -1;
+              }
+
+              for(int n = 0; n < 4; n += 2)
+              {
+                strncpy(hex_data, chunk +9+n, 2);
+                data = strtol(hex_data, &endptr, 16);
+                sum += data;
+                base_addr = (n < 2)? (data << 8) : (base_addr | data);
+              }
+              base_addr = base_addr << 4;
+
+              sum = (~sum) & 0xFF;
+              if((unsigned char) (sum +1) != chksum)
+              {
+                  return -1;
+              }
             break;
 
             case 0x3: // start segment addr
@@ -107,4 +120,5 @@ int hexread(EmulatorState* state, FILE* hexfile)
             break;
         }
     }
+    return 0;
 }
