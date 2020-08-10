@@ -12,7 +12,8 @@
 int main(int argc, char* argv[])
 {
   EmulatorState *state = initState();
-  int mem_size = 1024;
+  //int mem_size = 1024;
+  int mem_size = 0x10000; //fixed 64k for now
   state->mem = (uint8_t*) malloc(sizeof(uint8_t)*mem_size);
   if(state->mem == NULL)
     return -1;
