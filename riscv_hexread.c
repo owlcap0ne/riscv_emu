@@ -110,10 +110,52 @@ int hexread(EmulatorState* state, const char* hexfile)
             break;
 
             case 0x4: // extended linear addr
+                //copy-paste of type 0x02...
+                if(len != 0x02)
+                {
+                    return -1;
+                }
+
+                for(int n = 0; n < 4; n += 2)
+                {
+                    strncpy(hex_data, chunk +9+n, 2);
+                    data = strtol(hex_data, &endptr, 16);
+                    sum += data;
+                    base_addr = (n < 2)? (data << 8) : (base_addr | data);
+                }
+                base_addr = base_addr << 16;
+
+                sum = (~sum) & 0xFF;
+                if((unsigned char) (sum +1) != chksum)
+                {
+                    return -1;
+                }
             break;
 
             case 0x5: // start linear addr
-            // 80x86 processor specific, ignored
+            // 80x86 processor specific, apparently used to pass initial PC...
+                if(len != 0x04)
+                {
+                    return -1;
+                }
+
+                uint32_t pc = 0;
+                for(int n = 0; n < 8; n += 2)
+                {
+                    //left shift data by 24, 16, 8, 0
+                    int shamt = 24 - 4*n;
+                    strncpy(hex_data, chunk +9+n, 2);
+                    data = strtol(hex_data, &endptr, 16);
+                    sum += data;
+                    pc = pc | (data << shamt);
+                }
+                state->pc = pc;
+
+                sum = (~sum) & 0xFF;
+                if((unsigned char) (sum +1) != chksum)
+                {
+                    return -1;
+                }
             break;
 
             default: // unknown type, abort
