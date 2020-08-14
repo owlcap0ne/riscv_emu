@@ -33,5 +33,6 @@ int main(int argc, char* argv[])
       reg_write(state->rd, state->rd_dat);
     pc_inc(state);
   }
+  free(state->mem);
   return 0;
 }

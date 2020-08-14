@@ -13,7 +13,7 @@ static void write_mem_word(EmulatorState* state)
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
-    uint32_t *int_ptr = (uint32_t*) _mem + _mem_addr;
+    uint32_t *int_ptr = (uint32_t*) (_mem + _mem_addr);
     *int_ptr = _rs2_dat;
     return;
 }
@@ -25,7 +25,7 @@ static void write_mem_half(EmulatorState* state)
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
-    uint16_t *half_ptr = (uint16_t*) _mem + _mem_addr;
+    uint16_t *half_ptr = (uint16_t*) (_mem + _mem_addr);
     *half_ptr = (uint16_t) _rs2_dat;
     return;
 }
@@ -37,7 +37,7 @@ static void write_mem_byte(EmulatorState* state)
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
         return;
     }
-    uint8_t *byte_ptr = (uint8_t*) _mem + _mem_addr;
+    uint8_t *byte_ptr = (uint8_t*) (_mem + _mem_addr);
     *byte_ptr = (uint8_t) _rs2_dat;
     return;
 }
