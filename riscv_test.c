@@ -34,5 +34,6 @@ int main(int argc, char* argv[])
     pc_inc(state);
   }
   free(state->mem);
+  free(state);
   return 0;
 }
