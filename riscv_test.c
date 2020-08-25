@@ -24,8 +24,11 @@ int main(int argc, char* argv[])
   {
     fetch(state);
     decode(state);
-    state->rs1_dat = reg_read(state->rs1);
-    state->rs2_dat = reg_read(state->rs2);
+    //don't bother with reads from 'zero'
+    if(state->rs1)
+      state->rs1_dat = reg_read(state->rs1);
+    if(state->rs2)
+      state->rs2_dat = reg_read(state->rs2);
     execute(state);
     if(state->memory)
       memory(state);

@@ -50,6 +50,16 @@ enum Opcode
     EBREAK  //ignored
 };
 
+enum IType
+{
+  R_Type,
+  I_Type,
+  S_Type,
+  B_Type,
+  U_Type,
+  J_Type
+};
+
 /*
 //helper function, *regfile should be state->regfile and nothing else
 void reg_write(uint8_t reg, int32_t data, int32_t *regfile)
@@ -82,6 +92,7 @@ typedef struct
     bool branch;                //to branch or not to branch
     int32_t instr;              //signed, for easy sign extension
     enum Opcode op;
+    enum IType itype;           //just for pretty colors in the UI
     int32_t imm;                //imm's are always signed
     uint8_t rs1, rs2, rd;       //addr's of the 2 read, 1 write
                                 //ported regfile
@@ -106,6 +117,7 @@ EmulatorState* initState()
         state->branch = false;
         state->instr = 0x13;    //ADDI 0, 0, 0 - NOP
         state->op = ADDI;
+        state->itype = I_Type;
         state->imm = 0;
         state->rs1 = 0;
         state->rs2 = 0;

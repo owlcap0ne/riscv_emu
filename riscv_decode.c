@@ -7,6 +7,7 @@
 #define _rs2 state->rs2
 #define _imm state->imm
 #define _op state->op
+#define _itype state->itype
 #define _write state->write
 #define _memory state->memory
 
@@ -24,10 +25,17 @@ void decode(EmulatorState *state){
     int32_t imm_B_tmp = IMM_B(_instr);
     int32_t imm_U_tmp = IMM_U(_instr);
     int32_t imm_J_tmp = IMM_J(_instr);
+
+    //defaults
+    _rd   = 0;
+    _rs1  = 0;
+    _rs2  = 0;
+
     if(op == OPC_U_LUI)
     {
         _rd = RD(_instr);
         _imm = IMM_U(_instr);
+        _itype = U_Type;
         _op = LUI;
         _write = true;
         _memory = false;
@@ -37,6 +45,7 @@ void decode(EmulatorState *state){
     {
         _rd = RD(_instr);
         _imm = IMM_U(_instr);
+        _itype = U_Type;
         _op = AUIPC;
         _write = true;
         _memory = false;
@@ -47,6 +56,7 @@ void decode(EmulatorState *state){
         _rs1 = RS1(_instr);
         _rs2 = RS2(_instr);
         _imm = IMM_B(_instr);
+        _itype = B_Type;
         _write = false;
         _memory = false;
         switch(func3)
@@ -82,6 +92,7 @@ void decode(EmulatorState *state){
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
         _imm = IMM_I(_instr);
+        _itype = I_Type;
         _write = true;
         _memory = true;
         switch(func3)
@@ -113,6 +124,7 @@ void decode(EmulatorState *state){
         _rs1 = RS1(_instr);
         _rs2 = RS2(_instr);
         _imm = IMM_S(_instr);
+        _itype = S_Type;
         _write = false;
         _memory = true;
         switch(func3)
@@ -136,6 +148,7 @@ void decode(EmulatorState *state){
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
         _imm = IMM_I(_instr);
+        _itype = I_Type;
         _write = true;
         _memory = false;
         switch(func3)
@@ -186,6 +199,7 @@ void decode(EmulatorState *state){
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
         _rs2 = RS2(_instr);
+        _itype = R_Type;
         _write = true;
         _memory = false;
         switch(func3)
@@ -234,6 +248,7 @@ void decode(EmulatorState *state){
     {
         _rd = RD(_instr);
         _imm = IMM_J(_instr);
+        _itype = J_Type;
         _write = true;
         _op = JAL;
         _memory = false;
@@ -244,6 +259,7 @@ void decode(EmulatorState *state){
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
         _imm = IMM_I(_instr);
+        _itype = I_Type;
         _write = true;
         _memory = false;
         if(func3 == 0) //TODO: add trap for invalid _instructions
@@ -256,6 +272,7 @@ void decode(EmulatorState *state){
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
         _imm = 0;
+        _itype = I_Type;
         _write = true;
         _memory = false;
         if(func3 == 0)
@@ -266,6 +283,7 @@ void decode(EmulatorState *state){
     {
         //NOP - ADDI 0
         _imm = 0;
+        _itype = I_Type;
         _write = false;
         _memory = false;
         //technically imm_I == (0, 1) selects between ECALL and EBREAK
