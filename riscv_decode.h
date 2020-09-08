@@ -1,3 +1,7 @@
+#ifndef RISCV_DECODE
+#define RISCV_DECODE
+
+void decode(EmulatorState *state);
 
 /*
  Imm Variants:
@@ -112,3 +116,6 @@
 //0b0001111
 #define OPC_I_ENV       0x73
 //0b1110011
+
+
+#endif

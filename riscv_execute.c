@@ -14,7 +14,7 @@
 void execute(EmulatorState* state)
 {
     _branch = false; //default
-    
+
     switch(_op)
     {
         case LUI:

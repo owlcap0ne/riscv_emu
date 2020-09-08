@@ -118,7 +118,7 @@ void memory(EmulatorState* state)
             break;
 
         case LHU:
-            read_mem_byteu(state);
+            read_mem_halfu(state);
             break;
 
         case SB:

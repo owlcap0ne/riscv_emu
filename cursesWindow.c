@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
     printw("Press F1 to exit");
     refresh();
-    
+
     //    createWin(height, width, starty, startx);
     winInstr = createWin(5, 41, 0, 0);
     winPC = createWin(5, 39, 0, 41);
@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
         waddBit(winInstr, instr, i);
     }
 
+    wrefresh(winInstr);
 
     for(int j = 0; j < 32; j++)
     {
@@ -61,13 +62,18 @@ int main(int argc, char* argv[])
             waddBit(winRegs, reg_read(j), b);
         }
     }
-    
+
     wrefresh(winRegs);
-    wrefresh(winInstr);
+
+    mvwprintw(winPC, 1, 1, "Program Counter - curr:");
+    mvwprintw(winPC, 2, 1 +16, "- next:");
+    mvwprintw(winPC, 3, 1 +16, "branch:");
+
+    wrefresh(winPC);
 
     while((ch = getch()) != KEY_F(1))
     {
-        
+
     }
 
     destroyWin(winInstr);

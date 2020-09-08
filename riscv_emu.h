@@ -47,7 +47,7 @@ enum Opcode
     AND,
     FENCE,  //ignored
     ECALL,  //ignored
-    EBREAK  //ignored
+    EBREAK, //ignored
 };
 
 enum IType
@@ -57,7 +57,7 @@ enum IType
   S_Type,
   B_Type,
   U_Type,
-  J_Type
+  J_Type,
 };
 
 /*
@@ -106,32 +106,6 @@ typedef struct
 
 } EmulatorState;
 
-EmulatorState* initState()
-{
-    EmulatorState *state = (EmulatorState*)malloc(sizeof(EmulatorState));
-
-    if(state != NULL)
-    {
-        state->pc = 0;
-        state->branch_target = 0;
-        state->branch = false;
-        state->instr = 0x13;    //ADDI 0, 0, 0 - NOP
-        state->op = ADDI;
-        state->itype = I_Type;
-        state->imm = 0;
-        state->rs1 = 0;
-        state->rs2 = 0;
-        state->rd = 0;
-        state->rs1_dat = 0;
-        state->rs2_dat = 0;
-        state->rd_dat = 0;
-        state->mem_addr = 0;
-        state->write = false;
-        state->memory = false;
-        state->mem = NULL;
-        state->mem_size = 0;
-    }
-    return state;
-}
+EmulatorState* initState(void);
 
 #endif //RISCV_EMU_H
