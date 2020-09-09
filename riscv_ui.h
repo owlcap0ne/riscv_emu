@@ -22,6 +22,8 @@ void init_RegWin(WINDOW* win);
 
 void init_AddrWin(WINDOW* win);
 
+void init_MemWin(WINDOW* win);
+
 /*
 * Window update functions
 */
@@ -33,6 +35,8 @@ void update_PCWin(WINDOW* win, EmulatorState* state, bool color);
 void update_RegWin(WINDOW* win, EmulatorState* state, bool color);
 
 void update_AddrWin(WINDOW* win, EmulatorState* state, bool color);
+
+void update_MemWin(WINDOW* win, EmulatorState* state, bool color, uint32_t startAddr);
 
 /*
 * Helpers

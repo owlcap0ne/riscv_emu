@@ -14,7 +14,8 @@ int main(int argc, char* argv[])
 {
   EmulatorState *state = initState();
   //int mem_size = 1024;
-  int mem_size = 0x10000; //fixed 64k for now
+  //int mem_size = 0x10000; //fixed 64k for now
+  int mem_size = 0x20000FF; // required for memtest.hex?
   state->mem = (uint8_t*) malloc(sizeof(uint8_t)*mem_size);
   if(state->mem == NULL)
     return -1;
@@ -44,6 +45,7 @@ int main(int argc, char* argv[])
   init_RegWin(winRegs);
   init_PCWin(winPC);
   init_AddrWin(winAddr);
+  init_MemWin(winMem);
 
   wrefresh(winMem);
 
@@ -58,8 +60,13 @@ int main(int argc, char* argv[])
     //don't bother with reads from 'zero'
     if(state->rs1)
       state->rs1_dat = reg_read(state->rs1);
+    else
+      state->rs1_dat = 0;
     if(state->rs2)
       state->rs2_dat = reg_read(state->rs2);
+    else
+      state->rs2_dat = 0;
+    
     execute(state);
     if(state->memory)
       memory(state);
@@ -70,6 +77,7 @@ int main(int argc, char* argv[])
     update_RegWin(winRegs, state, false);
     update_InstrWin(winInstr, state, false);
     update_AddrWin(winAddr, state, false);
+    update_MemWin(winMem, state, false, 0x0000);
 
     while(1)
     {
