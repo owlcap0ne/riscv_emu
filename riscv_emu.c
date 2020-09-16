@@ -29,9 +29,16 @@ int main(int argc, char* argv[])
   WINDOW* winRegs;
   WINDOW* winMem;
 
+  // TODO: move all of that UI state stuff to a struct
+
+  // for now only the reg file base can be switched
+  enum UIBase regFileBase = BIN;
+  uint32_t memAddr = 0;
+
   initscr();
   cbreak();
   keypad(stdscr, TRUE);
+  int tmp = curs_set(0);
   refresh();
 
   winInstr = createWin(5, 41, 0, 0);
@@ -52,6 +59,7 @@ int main(int argc, char* argv[])
   mvaddstr(50, 0, "init done");
 
   int input;
+  char inputStr[9];
 
   while(1)
   {
@@ -74,10 +82,10 @@ int main(int argc, char* argv[])
       reg_write(state->rd, state->rd_dat);
 
     update_PCWin(winPC, state, false);
-    update_RegWin(winRegs, state, false);
+    update_RegWin(winRegs, state, false, regFileBase);
     update_InstrWin(winInstr, state, false);
     update_AddrWin(winAddr, state, false);
-    update_MemWin(winMem, state, false, 0x0000);
+    update_MemWin(winMem, state, false, memAddr);
 
     while(1)
     {
@@ -88,11 +96,33 @@ int main(int argc, char* argv[])
       }
       else if(input == KEY_F(1))
         break;
+      else if(input == KEY_F(3))
+      {
+        regFileBase = (regFileBase +1) %3;
+        update_RegWin(winRegs, state, false, regFileBase);
+      }
+      else if(input == KEY_F(2))
+      {
+        mvwprintw(winMem, 1, 40 -12, "0x        ");
+        wrefresh(winMem);
+        wmove(winMem, 1, 40 -10);
+        wattron(winMem, A_UNDERLINE);
+        echo();
+        wgetnstr(winMem, inputStr, 8);
+        inputStr[8] = '\0'; // just in case
+        noecho();
+        wattroff(winMem, A_UNDERLINE);
+        char *endptr; // tmp, ignore
+        memAddr = strtol(inputStr, &endptr, 16);
+        update_MemWin(winMem, state, false, memAddr);
+      }
     }
 
+    // scond check for exit, just slightly better than GOTO programming...
     if(input == KEY_F(1))
       break;
 
+    // two options: just draw as fast as possible, or only proceed on F9...
     pc_inc(state);
 
     input = 0;

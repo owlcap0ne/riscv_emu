@@ -5,6 +5,22 @@
 #include <curses.h>
 
 /*
+ * Enums and Strings
+ */
+extern const char* OpcodeS[];
+
+extern const char* ITypeS[];
+
+extern const char* ABINameS[];
+
+enum UIBase
+{
+    BIN,
+    DEC,
+    HEX
+};
+
+/*
 * Window init functions
 */
 
@@ -32,7 +48,7 @@ void update_InstrWin(WINDOW* win, EmulatorState* state, bool color);
 
 void update_PCWin(WINDOW* win, EmulatorState* state, bool color);
 
-void update_RegWin(WINDOW* win, EmulatorState* state, bool color);
+void update_RegWin(WINDOW* win, EmulatorState* state, bool color, enum UIBase base);
 
 void update_AddrWin(WINDOW* win, EmulatorState* state, bool color);
 
@@ -54,10 +70,5 @@ void mvwprintwBits(WINDOW* win, int y, int x, size_t const size, void const* ptr
 
 void waddBit(WINDOW* win, uint32_t data, unsigned int pos);
 
-extern const char* OpcodeS[];
-
-extern const char* ITypeS[];
-
-extern const char* ABINameS[];
 
 #endif

@@ -95,15 +95,34 @@ void init_RegWin(WINDOW* win)
   }
 }
 
-void update_RegWin(WINDOW* win, EmulatorState* state, bool color)
+void update_RegWin(WINDOW* win, EmulatorState* state, bool color, enum UIBase base)
 {
-  for(int l = 0; l < 32; l++)
+  switch(base)
   {
-    wmove(win, 2 +l, 8);
-    for(int b = 31; b >= 0; b--)
-    {
-      waddBit(win, reg_read(l), b);
-    }
+    case BIN:
+      for(int l = 0; l < 32; l++)
+      {
+        wmove(win, 2 +l, 8);
+        for(int b = 31; b >= 0; b--)
+        {
+          waddBit(win, reg_read(l), b);
+        }
+      }
+    break;
+
+    case DEC:
+      for(int l = 0; l < 32; l++)
+      {
+        mvwprintw(win, 2 +l, 8, " %-31d", reg_read(l));
+      }
+    break;
+
+    case HEX:
+      for(int l = 0; l < 32; l++)
+      {
+        mvwprintw(win, 2 +l, 8, " 0x%-29X", reg_read(l));
+      }
+    break;
   }
   wrefresh(win);
 }
@@ -113,7 +132,8 @@ void init_AddrWin(WINDOW* win)
   mvwprintw(win, 1, 1, "rs1:");
   mvwprintw(win, 2, 1, "rd:");
   mvwprintw(win, 1, 13, "rs2:");
-  mvwprintw(win, 2, 33, "imm:");
+  //mvwprintw(win, 2, 33, "imm:");
+  mvwprintw(win, 2, 25, "imm:");
   mvwprintw(win, 1, 80 -21, "Mem Addr:");
   mvwprintw(win, 2, 80 -21, "Mem Size:");
 }
@@ -129,7 +149,9 @@ void update_AddrWin(WINDOW* win, EmulatorState* state, bool color)
     mvwprintw(win, 2, 6, "-----");
 
   // immediate
-  mvwprintw(win, 2, 38, "%-11d", state->imm);
+  //mvwprintw(win, 2, 38, "%-11d", state->imm);
+  mvwprintw(win, 2, 30, "%-11d", state->imm);
+  wprintw(win, " (0x%-8X)", state->imm);
 
   // memory addresses
   if(state->memory)
@@ -150,7 +172,7 @@ void init_MemWin(WINDOW* win)
 
 void update_MemWin(WINDOW* win, EmulatorState* state, bool color, uint32_t startAddr)
 {
-  int n; // index into memory
+  uint64_t n; // index into memory, requires extra bits to avoid overflow
 
   wattron(win, A_UNDERLINE);
   mvwprintw(win, 1, 40 -12, "0x%+8X", startAddr);
@@ -167,17 +189,23 @@ void update_MemWin(WINDOW* win, EmulatorState* state, bool color, uint32_t start
         wattroff(win, A_REVERSE);
 
       n = startAddr + 16*y + x; // index into memory
-      if(n < state->mem_size)
+      if(n < (uint64_t) state->mem_size)
         wprintw(win, "%+2X", state->mem[n]);
       else
         wprintw(win, "--");
     }
     wmove(win, y+2, 40 -7);
-    if(n < state->mem_size)
+    if(n < (uint64_t) state->mem_size)
     {
       wprintw(win, "-");
       wattron(win, A_UNDERLINE);
       wprintw(win, "%+4X", (n & 0xFFFF));
+    }
+    else
+    {
+      wprintw(win, "-");
+      wattron(win, A_UNDERLINE);
+      wprintw(win, "----");
     }
     wattroff(win, A_UNDERLINE);
   }
