@@ -32,13 +32,26 @@ int main(int argc, char* argv[])
   // TODO: move all of that UI state stuff to a struct
 
   // for now only the reg file base can be switched
-  enum UIBase regFileBase = BIN;
+  enum UIBase regFileBase = HEX;
   uint32_t memAddr = 0;
+  bool hasColor = false;
 
   initscr();
   cbreak();
   keypad(stdscr, TRUE);
   int tmp = curs_set(0);
+
+  if(has_colors())
+  {
+    start_color();
+    hasColor = true;
+    init_pair(1, COLOR_WHITE, COLOR_RED);
+    init_pair(2, COLOR_WHITE, COLOR_GREEN);
+    init_pair(3, COLOR_WHITE, COLOR_BLUE);
+    init_pair(4, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(5, COLOR_BLACK, COLOR_CYAN);
+  }
+
   refresh();
 
   winInstr = createWin(5, 41, 0, 0);
@@ -81,11 +94,11 @@ int main(int argc, char* argv[])
     if(state->write)
       reg_write(state->rd, state->rd_dat);
 
-    update_PCWin(winPC, state, false);
-    update_RegWin(winRegs, state, false, regFileBase);
-    update_InstrWin(winInstr, state, false);
-    update_AddrWin(winAddr, state, false);
-    update_MemWin(winMem, state, false, memAddr);
+    update_PCWin(winPC, state, hasColor);
+    update_RegWin(winRegs, state, hasColor, regFileBase);
+    update_InstrWin(winInstr, state, hasColor);
+    update_AddrWin(winAddr, state, hasColor);
+    update_MemWin(winMem, state, hasColor, memAddr);
 
     while(1)
     {
@@ -99,7 +112,7 @@ int main(int argc, char* argv[])
       else if(input == KEY_F(3))
       {
         regFileBase = (regFileBase +1) %3;
-        update_RegWin(winRegs, state, false, regFileBase);
+        update_RegWin(winRegs, state, hasColor, regFileBase);
       }
       else if(input == KEY_F(2))
       {
@@ -114,7 +127,7 @@ int main(int argc, char* argv[])
         wattroff(winMem, A_UNDERLINE);
         char *endptr; // tmp, ignore
         memAddr = strtol(inputStr, &endptr, 16);
-        update_MemWin(winMem, state, false, memAddr);
+        update_MemWin(winMem, state, hasColor, memAddr);
       }
     }
 

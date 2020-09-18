@@ -15,21 +15,26 @@
 void decode(EmulatorState *state){
 
     uint8_t op = OP(_instr);
-    uint8_t rd_tmp = RD(_instr);
-    uint8_t rs1_tmp = RS1(_instr);
-    uint8_t rs2_tmp = RS2(_instr);
     uint8_t func3 = FUNC3(_instr);
     uint8_t func7 = FUNC7(_instr);
+    /*
+     * just for debug
     int32_t imm_I_tmp = IMM_I(_instr);
     int32_t imm_S_tmp = IMM_S(_instr);
     int32_t imm_B_tmp = IMM_B(_instr);
     int32_t imm_U_tmp = IMM_U(_instr);
     int32_t imm_J_tmp = IMM_J(_instr);
 
+    uint8_t rd_tmp = RD(_instr);
+    uint8_t rs1_tmp = RS1(_instr);
+    uint8_t rs2_tmp = RS2(_instr);
+    */
+
     //defaults
     _rd   = 0;
     _rs1  = 0;
     _rs2  = 0;
+    _imm  = 0;
 
     if(op == OPC_U_LUI)
     {

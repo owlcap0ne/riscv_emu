@@ -72,7 +72,15 @@ void init_PCWin(WINDOW* win)
 
 void update_PCWin(WINDOW* win, EmulatorState* state, bool color)
 {
-  mvwprintw(win, 1, 40 -12, "0x%-8X", state->pc);
+  if(color)
+  {
+    wattron(win, A_BOLD | COLOR_PAIR(4));
+    mvwprintw(win, 1, 40 -12, "0x%-8X", state->pc);
+    wattroff(win, A_BOLD | COLOR_PAIR(4));
+  }
+  else
+    mvwprintw(win, 1, 40 -12, "0x%-8X", state->pc);
+
   mvwprintw(win, 2, 40 -12, "0x%-8X", state->branch_target);
   if(state->branch)
     mvwprintw(win, 3, 40 -12, "TRUE ");
@@ -97,32 +105,40 @@ void init_RegWin(WINDOW* win)
 
 void update_RegWin(WINDOW* win, EmulatorState* state, bool color, enum UIBase base)
 {
-  switch(base)
+  for(int l = 0; l < 32; l++)
   {
-    case BIN:
-      for(int l = 0; l < 32; l++)
-      {
+    int colorPair = 0;
+    if(l == state->rs1)
+      colorPair = 1;
+    else if(l == state->rs2)
+      colorPair = 2;
+    else if(l == state->rd)
+      colorPair = 3;
+
+    if(color && colorPair)
+      wattron(win, A_BOLD | COLOR_PAIR(colorPair));
+
+    switch(base)
+    {
+      case BIN:
         wmove(win, 2 +l, 8);
         for(int b = 31; b >= 0; b--)
         {
           waddBit(win, reg_read(l), b);
         }
-      }
-    break;
+      break;
 
-    case DEC:
-      for(int l = 0; l < 32; l++)
-      {
+      case DEC:
         mvwprintw(win, 2 +l, 8, " %-31d", reg_read(l));
-      }
-    break;
+      break;
 
-    case HEX:
-      for(int l = 0; l < 32; l++)
-      {
+      case HEX:
         mvwprintw(win, 2 +l, 8, " 0x%-29X", reg_read(l));
-      }
-    break;
+      break;
+    }
+
+    wattroff(win, A_BOLD | COLOR_PAIR(colorPair));
+
   }
   wrefresh(win);
 }
@@ -141,10 +157,40 @@ void init_AddrWin(WINDOW* win)
 void update_AddrWin(WINDOW* win, EmulatorState* state, bool color)
 {
   // reg addresses
-  mvwprintw(win, 1, 6, "%-5s", ABINameS[state->rs1]);
-  mvwprintw(win, 1, 18, "%-5s", ABINameS[state->rs2]);
+  if(color)
+  {
+    wattron(win, COLOR_PAIR(1) | A_BOLD);
+    mvwprintw(win, 1, 6, "%-5s", ABINameS[state->rs1]);
+    wattroff(win, COLOR_PAIR(1) | A_BOLD);
+  }
+  else
+  {
+    mvwprintw(win, 1, 6, "%-5s", ABINameS[state->rs1]);
+  }
+
+  if(color)
+  {
+    wattron(win, COLOR_PAIR(2) | A_BOLD);
+    mvwprintw(win, 1, 18, "%-5s", ABINameS[state->rs2]);
+    wattroff(win, COLOR_PAIR(2) | A_BOLD);
+  }
+  else
+  {
+    mvwprintw(win, 1, 18, "%-5s", ABINameS[state->rs2]);
+  }
   if(state->write)
-    mvwprintw(win, 2, 6, "%-5s", ABINameS[state->rd]);
+  {
+    if(color)
+    {
+      wattron(win, COLOR_PAIR(3) | A_BOLD);
+      mvwprintw(win, 2, 6, "%-5s", ABINameS[state->rd]);
+      wattroff(win, COLOR_PAIR(3) | A_BOLD);
+    }
+    else
+    {
+      mvwprintw(win, 2, 6, "%-5s", ABINameS[state->rd]);
+    }
+  }
   else
     mvwprintw(win, 2, 6, "-----");
 
@@ -155,7 +201,14 @@ void update_AddrWin(WINDOW* win, EmulatorState* state, bool color)
 
   // memory addresses
   if(state->memory)
-    mvwprintw(win, 1, 80 -11, "0x%-8X", state->mem_addr);
+    if(color)
+    {
+      wattron(win, A_BOLD | COLOR_PAIR(5));
+      mvwprintw(win, 1, 80 -11, "0x%-8X", state->mem_addr);
+      wattroff(win, A_BOLD | COLOR_PAIR(5));
+    }
+    else
+      mvwprintw(win, 1, 80 -11, "0x%-8X", state->mem_addr);
   else
     mvwprintw(win, 1, 80 -11, "----------");
   mvwprintw(win, 2, 80 -11, "0x%-8X", state->mem_size);
@@ -183,16 +236,33 @@ void update_MemWin(WINDOW* win, EmulatorState* state, bool color, uint32_t start
     wmove(win, y +2, 1);
     for(int x = 0; x < 16; x++)
     {
+      int colorPair = 0;
       if((x == 0) || (x == 8))
         wattron(win, A_REVERSE);
       else if((x == 4) || (x == 12))
         wattroff(win, A_REVERSE);
 
       n = startAddr + 16*y + x; // index into memory
+
+      if((n >= state->pc) && (n < state->pc +4))
+        colorPair = 4;
+      else if ((n >= state->mem_addr) && (n < state->mem_addr +4) && state->memory)
+        colorPair = 5;
+
       if(n < (uint64_t) state->mem_size)
-        wprintw(win, "%+2X", state->mem[n]);
+        if(color)
+        {
+          wattron(win, A_BOLD | COLOR_PAIR(colorPair));
+          wprintw(win, "%+2X", state->mem[n]);
+          wattroff(win, COLOR_PAIR(colorPair));
+        }
+        else
+        {
+          wprintw(win, "%+2X", state->mem[n]);
+        }
       else
         wprintw(win, "--");
+      wattroff(win, A_BOLD);
     }
     wmove(win, y+2, 40 -7);
     if(n < (uint64_t) state->mem_size)
