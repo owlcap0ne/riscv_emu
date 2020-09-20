@@ -96,7 +96,8 @@ int hexread(EmulatorState* state, const char* hexfile)
                 sum += data;
                 base_addr = (n < 2)? (data << 8) : (base_addr | data);
               }
-              base_addr = base_addr << 4;
+              //base_addr = base_addr << 4;
+              base_addr = (base_addr << 4) % state->mem_size;
 
               sum = (~sum) & 0xFF;
               if((unsigned char) (sum +1) != chksum)
@@ -123,7 +124,8 @@ int hexread(EmulatorState* state, const char* hexfile)
                     sum += data;
                     base_addr = (n < 2)? (data << 8) : (base_addr | data);
                 }
-                base_addr = base_addr << 16;
+                //base_addr = base_addr << 16;
+                base_addr = (base_addr << 16) % state->mem_size;
 
                 sum = (~sum) & 0xFF;
                 if((unsigned char) (sum +1) != chksum)
@@ -149,7 +151,8 @@ int hexread(EmulatorState* state, const char* hexfile)
                     sum += data;
                     pc = pc | (data << shamt);
                 }
-                state->pc = pc;
+                //state->pc = pc;
+                state->pc = pc % state->mem_size;
 
                 sum = (~sum) & 0xFF;
                 if((unsigned char) (sum +1) != chksum)

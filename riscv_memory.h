@@ -3,4 +3,6 @@
 
 void memory(EmulatorState* state);
 
+void memory_zero(EmulatorState* state);
+
 #endif

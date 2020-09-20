@@ -108,4 +108,6 @@ typedef struct
 
 EmulatorState* initState(void);
 
+int reset(EmulatorState* state, const char* hexfile);
+
 #endif //RISCV_EMU_H

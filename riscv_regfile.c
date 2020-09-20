@@ -20,3 +20,9 @@ void reg_write(uint8_t reg, uint32_t val)
         return;
     }
 }
+
+void reg_reset()
+{
+  for(int n = 0; n < 32; n++)
+    regfile[n] = 0;
+}

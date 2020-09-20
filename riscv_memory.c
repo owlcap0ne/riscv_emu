@@ -138,3 +138,11 @@ void memory(EmulatorState* state)
     }
     return;
 }
+
+void memory_zero(EmulatorState* state)
+{
+  for(uint32_t n = 0; n < state->mem_size; n++)
+  {
+    state->mem[n] = 0;
+  }
+}
