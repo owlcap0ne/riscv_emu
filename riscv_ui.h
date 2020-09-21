@@ -72,6 +72,10 @@ void update_MemWin(UIState* ui, EmulatorState* state);
 
 void update_CtrlWin(UIState* ui, EmulatorState* state);
 
+void update_UI(UIState* ui, EmulatorState* state);
+
+void change_MemAddr(UIState* ui);
+
 /*
 * Helpers
 */
@@ -90,6 +94,8 @@ void waddBit(WINDOW* win, uint32_t data, unsigned int pos);
 
 
 UIState* initUI(void);
+
+void ui_exit(UIState* ui);
 
 
 #endif

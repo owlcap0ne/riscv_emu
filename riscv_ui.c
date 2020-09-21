@@ -260,7 +260,7 @@ void update_MemWin(UIState* ui, EmulatorState* state)
         {
           wattron(ui->winMem, A_BOLD | COLOR_PAIR(colorPair));
           wprintw(ui->winMem, "%+2X", state->mem[n]);
-          wattroff(ui->winMem, COLOR_PAIR(colorPair));
+          wattroff(ui->winMem, A_BOLD | COLOR_PAIR(colorPair));
         }
         else
         {
@@ -288,19 +288,37 @@ void update_MemWin(UIState* ui, EmulatorState* state)
   wrefresh(ui->winMem);
 }
 
+void change_MemAddr(UIState* ui)
+{
+  char inputStr[9];
+  mvwprintw(ui->winMem, 1, 40 -12, "0x        ");
+  wrefresh(ui->winMem);
+  wmove(ui->winMem, 1, 40 -10);
+  wattron(ui->winMem, A_UNDERLINE);
+  echo();
+  wgetnstr(ui->winMem, inputStr, 8);
+  inputStr[8] = '\0'; // just in case
+  noecho();
+  wattroff(ui->winMem, A_UNDERLINE);
+  char *endptr; // tmp, ignore
+  ui->memAddr = strtol(inputStr, &endptr, 16);
+}
+
 void init_CtrlWin(WINDOW* win)
 {
   box(win, 0, 0); // 0, 0 -> default chars for vert and horz
   wattron(win, A_REVERSE);
-  mvwprintw(win, 1, 1, "F1");
-  mvwprintw(win, 2, 1, "F2");
-  mvwprintw(win, 1, 20, "F3");
-  mvwprintw(win, 2, 20, "F9");
+  mvwprintw(win, 1, 1, "F 1");
+  mvwprintw(win, 2, 1, "F 2");
+  mvwprintw(win, 1, 21, "F 3");
+  mvwprintw(win, 2, 21, "F 9");
+  mvwprintw(win, 1, 41, "F12");
   wattroff(win, A_REVERSE);
-  mvwprintw(win, 1, 1 +3, "Exit");
-  mvwprintw(win, 2, 1 +3, "Set Memory Addr");
-  mvwprintw(win, 1, 20 +3, "Toggle Reg Base");
-  mvwprintw(win, 2, 20 +3, "Step");
+  mvwprintw(win, 1, 1 +4, "Exit");
+  mvwprintw(win, 2, 1 +4, "Set Memory Addr");
+  mvwprintw(win, 1, 21 +4, "Toggle Reg Base");
+  mvwprintw(win, 2, 21 +4, "Step");
+  mvwprintw(win, 1, 41 +4, "Reset");
 }
 
 void update_CtrlWin(UIState* ui, EmulatorState* state)
@@ -330,6 +348,27 @@ void destroyWin(WINDOW* local_win)
      */
     wrefresh(local_win);
     delwin(local_win);
+}
+
+void update_UI(UIState* ui, EmulatorState* state)
+{
+  update_PCWin(ui, state);
+  update_RegWin(ui, state);
+  update_InstrWin(ui, state);
+  update_AddrWin(ui, state);
+  update_MemWin(ui, state);
+  update_CtrlWin(ui, state);
+}
+
+void ui_exit(UIState* ui)
+{
+  destroyWin(ui->winInstr);
+  destroyWin(ui->winPC);
+  destroyWin(ui->winRegs);
+  destroyWin(ui->winMem);
+  destroyWin(ui->winAddr);
+  endwin();
+  free(ui);
 }
 
 const char* OpcodeS[] = {

@@ -36,24 +36,6 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-/*
-  WINDOW* winInstr;
-  WINDOW* winPC;
-  WINDOW* winAddr;
-  WINDOW* winRegs;
-  WINDOW* winMem;
-  WINDOW* winCtrl;
-  */
-
-  // TODO: move all of that UI state stuff to a struct
-
-  // for now only the reg file base can be switched
-  /*
-  enum UIBase regFileBase = HEX;
-  uint32_t memAddr = 0;
-  bool hasColor = false;
-  */
-
   initscr();
   cbreak();
   keypad(stdscr, TRUE);
@@ -82,15 +64,6 @@ int main(int argc, char* argv[])
 
   refresh();
 
-/*
-  winInstr = createWin(5, 41, 0, 0);
-  winPC = createWin(5, 39, 0, 41);
-  winAddr = createWin(4, 80, 5, 0);
-  winRegs = createWin(35, 41, 9, 0);
-  winMem = createWin(35, 39, 9, 41);
-  winCtrl = createWin(4, 80, 44, 0);
-  */
-
   init_InstrWin(ui->winInstr);
   init_PCWin(ui->winPC);
   init_RegWin(ui->winRegs);
@@ -99,88 +72,52 @@ int main(int argc, char* argv[])
   init_MemWin(ui->winMem);
   init_CtrlWin(ui->winCtrl);
 
-  wrefresh(ui->winMem);
-
-  mvaddstr(50, 0, "init done");
+  update_UI(ui, state);
 
   int input;
-  char inputStr[9];
 
   while(1)
   {
-    fetch(state);
-    decode(state);
-    //don't bother with reads from 'zero'
-    if(state->rs1)
-      state->rs1_dat = reg_read(state->rs1);
-    else
-      state->rs1_dat = 0;
-    if(state->rs2)
-      state->rs2_dat = reg_read(state->rs2);
-    else
-      state->rs2_dat = 0;
-
-    execute(state);
-    if(state->memory)
-      memory(state);
-    if(state->write)
-      reg_write(state->rd, state->rd_dat);
-
-    update_PCWin(ui, state);
-    update_RegWin(ui, state);
-    update_InstrWin(ui, state);
-    update_AddrWin(ui, state);
-    update_MemWin(ui, state);
-    update_CtrlWin(ui, state);
-
-    while(1)
+    input = getch();
+    if(input == KEY_F(9))
     {
-      input = getch();
-      if(input == KEY_F(9))
+      emu_cycle(state);
+      update_UI(ui, state);
+    }
+    else if(input == KEY_F(1))
+    {
+      ui_exit(ui);
+      emu_exit(state);
+      break;
+    }
+    else if(input == KEY_F(3))
+    {
+      ui->regFileBase = (ui->regFileBase +1) %3;
+      update_RegWin(ui, state);
+    }
+    else if(input == KEY_F(2))
+    {
+      change_MemAddr(ui);
+      update_MemWin(ui, state);
+    }
+    else if(input == KEY_F(12))
+    {
+      if(reset(state, argv[1]))
       {
-        break;
+        ui_exit(ui);
+        emu_exit(state);
+        return -1;
       }
-      else if(input == KEY_F(1))
-        break;
-      else if(input == KEY_F(3))
+      else
       {
-        ui->regFileBase = (ui->regFileBase +1) %3;
-        update_RegWin(ui, state);
-      }
-      else if(input == KEY_F(2))
-      {
-        mvwprintw(ui->winMem, 1, 40 -12, "0x        ");
-        wrefresh(ui->winMem);
-        wmove(ui->winMem, 1, 40 -10);
-        wattron(ui->winMem, A_UNDERLINE);
-        echo();
-        wgetnstr(ui->winMem, inputStr, 8);
-        inputStr[8] = '\0'; // just in case
-        noecho();
-        wattroff(ui->winMem, A_UNDERLINE);
-        char *endptr; // tmp, ignore
-        ui->memAddr = strtol(inputStr, &endptr, 16);
-        update_MemWin(ui, state);
-      }
-      else if(input == KEY_F(12))
-      {
-        if(reset(state, argv[1]))
-          return -1;
-        else
-          break;
+        update_UI(ui, state);
       }
     }
-
-    // scond check for exit, just slightly better than GOTO programming...
-    if(input == KEY_F(1))
-      break;
-
-    // two options: just draw as fast as possible, or only proceed on F9...
-    pc_inc(state);
 
     input = 0;
   }
 
+  /*
   destroyWin(ui->winInstr);
   destroyWin(ui->winPC);
   destroyWin(ui->winRegs);
@@ -191,6 +128,7 @@ int main(int argc, char* argv[])
 
   free(state->mem);
   free(state);
+  */
   return 0;
 }
 
@@ -245,9 +183,17 @@ void emu_cycle(EmulatorState* state)
   state->rs2_dat = reg_read(state->rs2);
 
   execute(state);
-  
+
   if(state->memory)
     memory(state);
   if(state->write)
     reg_write(state->rd, state->rd_dat);
+
+  pc_inc(state);
+}
+
+void emu_exit(EmulatorState* state)
+{
+  free(state->mem);
+  free(state);
 }

@@ -110,4 +110,8 @@ EmulatorState* initState(void);
 
 int reset(EmulatorState* state, const char* hexfile);
 
+void emu_cycle(EmulatorState* state);
+
+void emu_exit(EmulatorState* state);
+
 #endif //RISCV_EMU_H
