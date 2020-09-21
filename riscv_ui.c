@@ -38,7 +38,7 @@ void update_InstrWin(UIState* ui, EmulatorState* state)
 {
   mvwprintw(ui->winInstr, 1, 14, "%-6s", OpcodeS[state->op]);
   mvwprintw(ui->winInstr, 1, 21, "(%s)", ITypeS[state->itype]);
-  mvwprintw(ui->winInstr, 2, 40 -10, "0x%-8X", state->instr);
+  mvwprintw(ui->winInstr, 2, 40 -10, "0x%+08X", state->instr);
   wmove(ui->winInstr, 3, 40 -32);
   for(int i = 31; i >= 0; i--)
   {
@@ -78,17 +78,17 @@ void update_PCWin(UIState* ui, EmulatorState* state)
   if(ui->hasColor)
   {
     wattron(ui->winPC, A_BOLD | COLOR_PAIR(4));
-    mvwprintw(ui->winPC, 1, 40 -12, "0x%-8X", state->pc);
+    mvwprintw(ui->winPC, 1, 40 -12, "0x%+08X", state->pc);
     wattroff(ui->winPC, A_BOLD | COLOR_PAIR(4));
     if(state->branch)
       wattron(ui->winPC, A_BOLD | COLOR_PAIR(6));
-    mvwprintw(ui->winPC, 2, 40 -12, "0x%-8X", state->branch_target);
+    mvwprintw(ui->winPC, 2, 40 -12, "0x%+08X", state->branch_target);
     wattroff(ui->winPC, A_BOLD | COLOR_PAIR(6));
   }
   else
   {
-    mvwprintw(ui->winPC, 1, 40 -12, "0x%-8X", state->pc);
-    mvwprintw(ui->winPC, 2, 40 -12, "0x%-8X", state->branch_target);
+    mvwprintw(ui->winPC, 1, 40 -12, "0x%+08X", state->pc);
+    mvwprintw(ui->winPC, 2, 40 -12, "0x%+08X", state->branch_target);
   }
 
   if(state->branch)
@@ -208,21 +208,21 @@ void update_AddrWin(UIState* ui, EmulatorState* state)
   // immediate
   //mvwprintw(ui->winAddr, 2, 38, "%-11d", state->imm);
   mvwprintw(ui->winAddr, 2, 30, "%-11d", state->imm);
-  wprintw(ui->winAddr, " (0x%-8X)", state->imm);
+  wprintw(ui->winAddr, " (0x%+08X)", state->imm);
 
   // memory addresses
   if(state->memory)
     if(ui->hasColor)
     {
       wattron(ui->winAddr, A_BOLD | COLOR_PAIR(5));
-      mvwprintw(ui->winAddr, 1, 80 -11, "0x%-8X", state->mem_addr);
+      mvwprintw(ui->winAddr, 1, 80 -11, "0x%+08X", state->mem_addr);
       wattroff(ui->winAddr, A_BOLD | COLOR_PAIR(5));
     }
     else
-      mvwprintw(ui->winAddr, 1, 80 -11, "0x%-8X", state->mem_addr);
+      mvwprintw(ui->winAddr, 1, 80 -11, "0x%+08X", state->mem_addr);
   else
     mvwprintw(ui->winAddr, 1, 80 -11, "----------");
-  mvwprintw(ui->winAddr, 2, 80 -11, "0x%-8X", state->mem_size);
+  mvwprintw(ui->winAddr, 2, 80 -11, "0x%+08X", state->mem_size);
 
   wrefresh(ui->winAddr);
 }
@@ -283,12 +283,12 @@ void update_MemWin(UIState* ui, EmulatorState* state)
         if(ui->hasColor)
         {
           wattron(ui->winMem,COLOR_PAIR(colorPair));
-          wprintw(ui->winMem, "%+2X", state->mem[n]);
+          wprintw(ui->winMem, "%+02X", state->mem[n]);
           wattroff(ui->winMem,COLOR_PAIR(colorPair));
         }
         else
         {
-          wprintw(ui->winMem, "%+2X", state->mem[n]);
+          wprintw(ui->winMem, "%+02X", state->mem[n]);
         }
       else
         wprintw(ui->winMem, "--");
@@ -299,7 +299,7 @@ void update_MemWin(UIState* ui, EmulatorState* state)
     {
       wprintw(ui->winMem, "-");
       wattron(ui->winMem, A_UNDERLINE);
-      wprintw(ui->winMem, "%+4X", (n & 0xFFFF));
+      wprintw(ui->winMem, "%+04X", (n & 0xFFFF));
     }
     else
     {
