@@ -19,9 +19,8 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  //int mem_size = 1024;
-  //int mem_size = 0x10000; //fixed 64k for now
-  int mem_size = 0x20000FF; // required for memtest.hex?
+  int mem_size = 0x10000; //fixed 64k for now
+  //int mem_size = 0x20000FF; // required for memtest.hex?
   state->mem = (uint8_t*) malloc(sizeof(uint8_t)*mem_size);
   if(state->mem == NULL)
   {
@@ -53,13 +52,13 @@ int main(int argc, char* argv[])
   if(has_colors())
   {
     start_color();
-    //hasColor = true;
     ui->hasColor = true;
     init_pair(1, COLOR_WHITE, COLOR_RED);
     init_pair(2, COLOR_WHITE, COLOR_GREEN);
     init_pair(3, COLOR_WHITE, COLOR_BLUE);
-    init_pair(4, COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(5, COLOR_BLACK, COLOR_CYAN);
+    init_pair(4, COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(5, COLOR_WHITE, COLOR_CYAN);
+    init_pair(6, COLOR_WHITE, COLOR_YELLOW);
   }
 
   refresh();
@@ -72,7 +71,12 @@ int main(int argc, char* argv[])
   init_MemWin(ui->winMem);
   init_CtrlWin(ui->winCtrl);
 
+  // only needed for the UI...
+  emu_cycle(state);
+
   update_UI(ui, state);
+
+  pc_inc(state);
 
   int input;
 
@@ -83,6 +87,7 @@ int main(int argc, char* argv[])
     {
       emu_cycle(state);
       update_UI(ui, state);
+      pc_inc(state);
     }
     else if(input == KEY_F(1))
     {
@@ -110,25 +115,15 @@ int main(int argc, char* argv[])
       }
       else
       {
+        emu_cycle(state);
         update_UI(ui, state);
+        pc_inc(state);
       }
     }
 
     input = 0;
   }
 
-  /*
-  destroyWin(ui->winInstr);
-  destroyWin(ui->winPC);
-  destroyWin(ui->winRegs);
-  destroyWin(ui->winMem);
-  destroyWin(ui->winAddr);
-  endwin();
-  free(ui);
-
-  free(state->mem);
-  free(state);
-  */
   return 0;
 }
 
@@ -165,6 +160,13 @@ int reset(EmulatorState* state, const char* hexfile)
   reg_reset();
   memory_zero(state);
   state->pc = 0; // in case the Hexfile doesn't modify it
+  //not strictly neccessary, but otherwise the UI shows outdated info
+  state->rs1 = 0;
+  state->rs2 = 0;
+  state->rd = 0;
+  state->write = false;
+  state->branch = false;
+  state->memory = false;
   if(hexread(state, hexfile))
   {
     printf("Something went wrong with the Hexfile");
@@ -188,8 +190,6 @@ void emu_cycle(EmulatorState* state)
     memory(state);
   if(state->write)
     reg_write(state->rd, state->rd_dat);
-
-  pc_inc(state);
 }
 
 void emu_exit(EmulatorState* state)

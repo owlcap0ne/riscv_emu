@@ -80,11 +80,17 @@ void update_PCWin(UIState* ui, EmulatorState* state)
     wattron(ui->winPC, A_BOLD | COLOR_PAIR(4));
     mvwprintw(ui->winPC, 1, 40 -12, "0x%-8X", state->pc);
     wattroff(ui->winPC, A_BOLD | COLOR_PAIR(4));
+    if(state->branch)
+      wattron(ui->winPC, A_BOLD | COLOR_PAIR(6));
+    mvwprintw(ui->winPC, 2, 40 -12, "0x%-8X", state->branch_target);
+    wattroff(ui->winPC, A_BOLD | COLOR_PAIR(6));
   }
   else
+  {
     mvwprintw(ui->winPC, 1, 40 -12, "0x%-8X", state->pc);
+    mvwprintw(ui->winPC, 2, 40 -12, "0x%-8X", state->branch_target);
+  }
 
-  mvwprintw(ui->winPC, 2, 40 -12, "0x%-8X", state->branch_target);
   if(state->branch)
     mvwprintw(ui->winPC, 3, 40 -12, "TRUE ");
   else
@@ -251,16 +257,34 @@ void update_MemWin(UIState* ui, EmulatorState* state)
       n = ui->memAddr + 16*y + x; // index into memory
 
       if((n >= state->pc) && (n < state->pc +4))
+      {
         colorPair = 4;
+        wattron(ui->winMem, A_BOLD);
+        wattroff(ui->winMem, A_REVERSE);
+      }
       else if ((n >= state->mem_addr) && (n < state->mem_addr +4) && state->memory)
+      {
         colorPair = 5;
+        wattron(ui->winMem, A_BOLD);
+        wattroff(ui->winMem, A_REVERSE);
+      }
+      else if((n >= state->branch_target) && (n < state->branch_target +4) && state->branch)
+      {
+        colorPair = 6;
+        wattron(ui->winMem, A_BOLD);
+        wattroff(ui->winMem, A_REVERSE);
+      }
+      else
+      {
+        wattroff(ui->winMem, A_BOLD);
+      }
 
       if(n < (uint64_t) state->mem_size)
         if(ui->hasColor)
         {
-          wattron(ui->winMem, A_BOLD | COLOR_PAIR(colorPair));
+          wattron(ui->winMem,COLOR_PAIR(colorPair));
           wprintw(ui->winMem, "%+2X", state->mem[n]);
-          wattroff(ui->winMem, A_BOLD | COLOR_PAIR(colorPair));
+          wattroff(ui->winMem,COLOR_PAIR(colorPair));
         }
         else
         {
