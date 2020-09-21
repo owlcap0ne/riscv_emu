@@ -74,7 +74,7 @@ void decode(EmulatorState *state);
                         |(instr & MASK_IMM_19_12))
 
 #define IMM_J(instr)    (((instr & MASK_IMM_31)    >> 11) \
-                        |((instr & MASK_IMM_19_12) >> 12) \
+                        | (instr & MASK_IMM_19_12)        \
                         |((instr & MASK_IMM_20)    >>  9) \
                         |((instr & MASK_IMM_30_25) >> 20) \
                         |((instr & MASK_IMM_24_21) >> 20))
