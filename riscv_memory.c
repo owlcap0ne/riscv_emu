@@ -6,137 +6,139 @@
 #define _rd_dat state->rd_dat
 #define _rs2_dat state->rs2_dat
 
-static void write_mem_word(EmulatorState* state)
+static int write_mem_word(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint32_t) > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     uint32_t *int_ptr = (uint32_t*) (_mem + _mem_addr);
     *int_ptr = _rs2_dat;
-    return;
+    return 0;
 }
 
-static void write_mem_half(EmulatorState* state)
+static int write_mem_half(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     uint16_t *half_ptr = (uint16_t*) (_mem + _mem_addr);
     *half_ptr = (uint16_t) _rs2_dat;
-    return;
+    return 0;
 }
 
-static void write_mem_byte(EmulatorState* state)
+static int write_mem_byte(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     uint8_t *byte_ptr = (uint8_t*) (_mem + _mem_addr);
     *byte_ptr = (uint8_t) _rs2_dat;
-    return;
+    return 0;
 }
 
-static void read_mem_word(EmulatorState* state)
+static int read_mem_word(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint32_t) > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     _rd_dat = *((uint32_t*) (_mem + _mem_addr));
-    return;
+    return 0;
 }
 
-static void read_mem_half(EmulatorState* state)
+static int read_mem_half(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     _rd_dat = (*((int16_t*) (_mem + _mem_addr)) << 16 >> 16);
-    return;
+    return 0;
 }
 
-static void read_mem_halfu(EmulatorState* state)
+static int read_mem_halfu(EmulatorState* state)
 {
     if(_mem_addr + sizeof(uint16_t) > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     _rd_dat = *((uint16_t*) (_mem + _mem_addr));
-    return;
+    return 0;
 }
 
-static void read_mem_byte(EmulatorState* state)
+static int read_mem_byte(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     _rd_dat = (*((int8_t*) (_mem + _mem_addr)) << 24 >> 24);
-    return;
+    return 0;
 }
 
-static void read_mem_byteu(EmulatorState* state)
+static int read_mem_byteu(EmulatorState* state)
 {
     if(_mem_addr > _mem_size)
     {
         printf("ERROR: invalid memory access @ %x\n", _mem_addr);
-        return;
+        return -1;
     }
     _rd_dat = *((uint8_t*) (_mem + _mem_addr));
-    return;
+    return 0;
 }
 
-void memory(EmulatorState* state)
+int memory(EmulatorState* state)
 {
+    int ret;
     switch(state->op)
     {
         case LB:
-            read_mem_byte(state);
+            ret = read_mem_byte(state);
             break;
 
         case LH:
-            read_mem_half(state);
+            ret = read_mem_half(state);
             break;
 
         case LW:
-            read_mem_word(state);
+            ret = read_mem_word(state);
             break;
 
         case LBU:
-            read_mem_byteu(state);
+            ret = read_mem_byteu(state);
             break;
 
         case LHU:
-            read_mem_halfu(state);
+            ret = read_mem_halfu(state);
             break;
 
         case SB:
-            write_mem_byte(state);
+            ret = write_mem_byte(state);
             break;
 
         case SH:
-            write_mem_half(state);
+            ret = write_mem_half(state);
             break;
 
         case SW:
-            write_mem_word(state);
+            ret = write_mem_word(state);
             break;
 
         default:
+            ret = -1;
             break;
     }
-    return;
+    return ret;
 }
 
 void memory_zero(EmulatorState* state)
@@ -145,4 +147,29 @@ void memory_zero(EmulatorState* state)
   {
     state->mem[n] = 0;
   }
+}
+
+int memory_dump(EmulatorState* state, const char* dumpfile)
+{
+  FILE *fp = fopen(dumpfile, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "Unable to open File for writing");
+    return -1;
+  }
+
+  fprintf(fp, "//RISCV Emulator memory dump\n//uses Verilog-style .hex syntax\n//each symbol represents one memory byte, seperated by whitespaces\n//little endian ordering, starting from addr zero\n");
+
+  for(int i = 0; i < state->mem_size; i++)
+  {
+    fprintf(fp, "%+02x", state->mem[i]);
+    // group four bytes onto a line
+    if(((i +1) % 4) == 0)
+      fprintf(fp, "\n");
+    else
+      fprintf(fp, " ");
+  }
+
+  fclose(fp);
+  return 0;
 }

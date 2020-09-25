@@ -7,7 +7,7 @@ int hexread(EmulatorState* state, const char* hexfile)
     FILE *fp = fopen(hexfile, "r");
     if(fp == NULL)
     {
-        perror("Unable to open File");
+        fprintf(stderr, "Unable to open File for reading");
         return -1;
     }
 
@@ -35,6 +35,7 @@ int hexread(EmulatorState* state, const char* hexfile)
         //shortest possible line is EOF with 11 chars excluding whitespaces
         if((chunk[0] != ':') || (str_len < 11))
         {
+            fclose(fp);
             return -1;
         }
         strncpy(hex_len, chunk +1, 2);
@@ -59,6 +60,7 @@ int hexread(EmulatorState* state, const char* hexfile)
                 {
                     if(addr > state->mem_size)
                     {
+                        fclose(fp);
                         return -1;
                     }
                     strncpy(hex_data, chunk +9+n, 2);
@@ -70,6 +72,7 @@ int hexread(EmulatorState* state, const char* hexfile)
 
                 if((unsigned char) ((~sum & 0xFF) +1) != chksum)
                 {
+                    fclose(fp);
                     return -1;
                 }
             break;
@@ -78,6 +81,7 @@ int hexread(EmulatorState* state, const char* hexfile)
                 sum = ((~sum) & 0xFF) +1;
                 if((unsigned char) sum != chksum)
                 {
+                    fclose(fp);
                     return -1;
                 }
             break;
@@ -86,6 +90,7 @@ int hexread(EmulatorState* state, const char* hexfile)
               // sanity check
               if(len != 0x02)
               {
+                fclose(fp);
                 return -1;
               }
 
@@ -102,6 +107,7 @@ int hexread(EmulatorState* state, const char* hexfile)
               sum = (~sum) & 0xFF;
               if((unsigned char) (sum +1) != chksum)
               {
+                  fclose(fp);
                   return -1;
               }
             break;
@@ -114,6 +120,7 @@ int hexread(EmulatorState* state, const char* hexfile)
                 //copy-paste of type 0x02...
                 if(len != 0x02)
                 {
+                    fclose(fp);
                     return -1;
                 }
 
@@ -130,6 +137,7 @@ int hexread(EmulatorState* state, const char* hexfile)
                 sum = (~sum) & 0xFF;
                 if((unsigned char) (sum +1) != chksum)
                 {
+                    fclose(fp);
                     return -1;
                 }
             break;
@@ -138,6 +146,7 @@ int hexread(EmulatorState* state, const char* hexfile)
             // 80x86 processor specific, apparently used to pass initial PC...
                 if(len != 0x04)
                 {
+                    fclose(fp);
                     return -1;
                 }
 
@@ -157,6 +166,7 @@ int hexread(EmulatorState* state, const char* hexfile)
                 sum = (~sum) & 0xFF;
                 if((unsigned char) (sum +1) != chksum)
                 {
+                    fclose(fp);
                     return -1;
                 }
             break;
@@ -165,5 +175,6 @@ int hexread(EmulatorState* state, const char* hexfile)
             break;
         }
     }
+    fclose(fp);
     return 0;
 }

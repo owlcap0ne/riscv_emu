@@ -337,12 +337,14 @@ void init_CtrlWin(WINDOW* win)
   mvwprintw(win, 1, 21, "F 3");
   mvwprintw(win, 2, 21, "F 9");
   mvwprintw(win, 1, 41, "F12");
+  mvwprintw(win, 2, 41, "F5");
   wattroff(win, A_REVERSE);
   mvwprintw(win, 1, 1 +4, "Exit");
   mvwprintw(win, 2, 1 +4, "Set Memory Addr");
   mvwprintw(win, 1, 21 +4, "Toggle Reg Base");
   mvwprintw(win, 2, 21 +4, "Step");
   mvwprintw(win, 1, 41 +4, "Reset");
+  mvwprintw(win, 2, 41 +4, "Dump Memory");
 }
 
 void update_CtrlWin(UIState* ui, EmulatorState* state)
