@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   EmulatorState *state = initState();
   if(state == NULL)
   {
-    fprintf(stderr, "Something went wrong: Can't allocate EmulatorState");
+    fprintf(stderr, "Something went wrong: Can't allocate EmulatorState\n");
     return -1;
   }
 
@@ -24,14 +24,14 @@ int main(int argc, char* argv[])
   state->mem = (uint8_t*) malloc(sizeof(uint8_t)*mem_size);
   if(state->mem == NULL)
   {
-    fprintf(stderr, "Something went wrong: Can't allocate Emulator Memory");
+    fprintf(stderr, "Something went wrong: Can't allocate Emulator Memory\n");
     return -1;
   }
 
   state->mem_size = mem_size;
   if(hexread(state, argv[1]) < 0)
   {
-    fprintf(stderr, "Something went wrong with the Hexfile");
+    fprintf(stderr, "Something went wrong with the Hexfile\n");
     return -1;
   }
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   UIState *ui = initUI();
   if(ui == NULL)
   {
-    fprintf(stderr, "Something went wrong: Can't allocate UIState");
+    fprintf(stderr, "Something went wrong: Can't allocate UIState\n");
     return -1;
   }
 
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
     else if(input == KEY_F(5))
     {
       if(memory_dump(state, "memdump.hex"))
-        fprintf(stderr, "Error dumping memory");
+        fprintf(stderr, "Error dumping memory\n");
     }
 
     input = 0;
@@ -174,7 +174,7 @@ int reset(EmulatorState* state, const char* hexfile)
   state->memory = false;
   if(hexread(state, hexfile))
   {
-    fprintf(stderr, "Something went wrong with the Hexfile");
+    fprintf(stderr, "Something went wrong with the Hexfile\n");
     return -1;
   }
 
@@ -194,7 +194,7 @@ void emu_cycle(EmulatorState* state)
   if(state->memory)
     if(memory(state))
     {
-      fprintf(stderr, "Memory Error @ %x, Op = %s, PC = %x", state->mem_addr,
+      fprintf(stderr, "Memory Error @ %x, Op = %s, PC = %x\n", state->mem_addr,
               OpcodeS[state->op], state->pc);
     }
   if(state->write)

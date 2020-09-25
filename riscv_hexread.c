@@ -7,7 +7,7 @@ int hexread(EmulatorState* state, const char* hexfile)
     FILE *fp = fopen(hexfile, "r");
     if(fp == NULL)
     {
-        fprintf(stderr, "Unable to open File for reading");
+        fprintf(stderr, "Unable to open File for reading\n");
         return -1;
     }
 
