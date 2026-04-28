@@ -2,7 +2,7 @@ cunit_test:
   stage: test
   image: gcc:latest
   before_script:
-    - apt-get update && apt-get install -y libcunit-dev libncurses-dev
+    - apt-get update && apt-get install -y libcunit1-dev libncurses-dev
   script:
     - cd cunit
     - make
