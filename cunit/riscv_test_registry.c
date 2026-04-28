@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include "../riscv_emu.h"
 
-#define ROOT_NAME "Init"
+#define ROOT_NAME "Test-Init"
 
 #define MEM_SIZE 0x10000
 #define TESTING

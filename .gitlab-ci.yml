@@ -9,5 +9,7 @@ cunit_test:
     - ./riscv_test.bin
   artifacts:
     when: always
+    paths:
+      - ./cunit/Test-*-Results.xml
     reports:
-      junit: ./cunit/Init-Results.xml
+      junit: ./cunit/Test-*-Results.xml
