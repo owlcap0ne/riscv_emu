@@ -12,3 +12,9 @@
 !tests/*.c
 !tests/*.hex
 !tests/Makefile
+!cunit/
+/cunit/*
+!cunit/*.c
+!cunit/*.h
+!cunit/Makefile
+!.gitlab-ci.yml
