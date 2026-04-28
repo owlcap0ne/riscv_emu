@@ -1,0 +1,14 @@
+/*
+!*.c
+!*.h
+!Makefile
+!.gitignore
+!*.hex
+!*.S
+!tests/
+/tests/*
+!tests/*.lds
+!tests/*.S
+!tests/*.c
+!tests/*.hex
+!tests/Makefile
