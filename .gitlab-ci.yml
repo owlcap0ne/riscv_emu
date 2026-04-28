@@ -1,3 +1,21 @@
+lint:
+  stage: lint
+  image: gcc:latest
+  before_script:
+    - apt-get update && apt-get install -y cppcheck python3 python3-pip
+    - python3 -m venv myenv
+    - source myenv/bin/activate
+    - pip3 install xmltodict
+  script:
+    - cppcheck **.c **.h --xml 2> ./lint/cppcheck_result.xml
+    - cd ./lint
+    - python3 cppcheck_xml2json.py
+  artifacts:
+    paths:
+      - ./lint/cppcheck_result.json
+    reports:
+      codequality: ./lint/cppcheck_result.json
+
 cunit_test:
   stage: test
   image: gcc:latest
