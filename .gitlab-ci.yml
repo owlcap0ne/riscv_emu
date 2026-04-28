@@ -1,5 +1,5 @@
 lint:
-  stage: lint
+  stage: test
   image: gcc:latest
   before_script:
     - apt-get update && apt-get install -y cppcheck python3 python3-pip
