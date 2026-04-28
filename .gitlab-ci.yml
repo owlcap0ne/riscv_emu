@@ -10,4 +10,4 @@ cunit_test:
   artifacts:
     when: always
     reports:
-      junit: Init-Results.xml
+      junit: ./cunit/Init-Results.xml
