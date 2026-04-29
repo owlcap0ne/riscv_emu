@@ -108,6 +108,8 @@ typedef struct
 
 EmulatorState* initState(void);
 
+void resetState(EmulatorState* state);
+
 int reset(EmulatorState* state, const char* hexfile);
 
 void emu_cycle(EmulatorState* state);

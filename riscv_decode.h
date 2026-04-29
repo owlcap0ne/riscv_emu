@@ -1,3 +1,5 @@
+#include "riscv_emu.h"
+
 #ifndef RISCV_DECODE
 #define RISCV_DECODE
 

@@ -37,6 +37,29 @@ EmulatorState* initState()
     return state;
 }
 
+void resetState(EmulatorState* state)
+{
+  if(state != NULL)
+    {
+        state->pc = 0;
+        state->branch_target = 0;
+        state->branch = false;
+        state->instr = 0x13;    //ADDI 0, 0, 0 - NOP
+        state->op = ADDI;
+        state->itype = I_Type;
+        state->imm = 0;
+        state->rs1 = 0;
+        state->rs2 = 0;
+        state->rd = 0;
+        state->rs1_dat = 0;
+        state->rs2_dat = 0;
+        state->rd_dat = 0;
+        state->mem_addr = 0;
+        state->write = false;
+        state->memory = false;
+    }
+}
+
 int reset(EmulatorState* state, const char* hexfile)
 {
   reg_reset();

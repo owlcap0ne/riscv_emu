@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "../riscv_emu.h"
+#include "../riscv_decode.h"
+#include "riscv_test_util.c"
 
 #define ROOT_NAME "Test-Init"
 
@@ -43,6 +45,18 @@ void init_test() {
     CU_ASSERT_PTR_NOT_NULL(emu_state->mem);
 }
 
+void decode_nop_test() {
+    uint32_t instr = built_instr(ADDI, 0, 0, 0, 0);
+    resetState(emu_state);
+    emu_state->instr = instr;
+    decode(emu_state);
+    CU_ASSERT_EQUAL(emu_state->op, ADDI);
+    CU_ASSERT_EQUAL(emu_state->itype, I_Type);
+    CU_ASSERT_EQUAL(emu_state->imm, 0);
+    CU_ASSERT_EQUAL(emu_state->rs1, 0);
+    CU_ASSERT_EQUAL(emu_state->rd, 0);
+}
+
 #ifdef TESTING
 int main() {
 
@@ -62,6 +76,11 @@ int main() {
 
     // add test to suite
     if(CU_add_test(pSuite, "init_test", init_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite, "decode_nop_test", decode_nop_test) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
