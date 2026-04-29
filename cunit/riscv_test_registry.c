@@ -57,6 +57,18 @@ void decode_nop_test() {
     CU_ASSERT_EQUAL(emu_state->rd, 0);
 }
 
+void decode_signed_test() {
+    uint32_t instr = built_instr(ADDI, -1, 0, 0, 0);
+    resetState(emu_state);
+    emu_state->instr = instr;
+    decode(emu_state);
+    CU_ASSERT_EQUAL(emu_state->op, ADDI);
+    CU_ASSERT_EQUAL(emu_state->itype, I_Type);
+    CU_ASSERT_EQUAL(emu_state->imm, -1);
+    CU_ASSERT_EQUAL(emu_state->rs1, 0);
+    CU_ASSERT_EQUAL(emu_state->rd, 0);
+}
+
 #ifdef TESTING
 int main() {
 
@@ -81,6 +93,11 @@ int main() {
     }
 
     if(CU_add_test(pSuite, "decode_nop_test", decode_nop_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite, "decode_signed_test", decode_signed_test) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
