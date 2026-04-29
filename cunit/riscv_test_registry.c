@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include "../riscv_emu.h"
 #include "../riscv_decode.h"
+#include "../riscv_regfile.h"
+#include "../riscv_execute.h"
 #include "riscv_test_util.c"
 
 #define ROOT_NAME "Test-Init"
@@ -31,8 +33,10 @@ int init_suite() {
 }
 
 int clean_suite() {
-    free(emu_state->mem);
-    free(emu_state);
+    if(emu_state->mem)
+        free(emu_state->mem);
+    if(emu_state)
+        free(emu_state);
     return 0;
 }
 
@@ -55,6 +59,24 @@ void decode_nop_test() {
     CU_ASSERT_EQUAL(emu_state->imm, 0);
     CU_ASSERT_EQUAL(emu_state->rs1, 0);
     CU_ASSERT_EQUAL(emu_state->rd, 0);
+}
+
+void execute_add_test() {
+    uint32_t instr = built_instr(ADDI, 1, 0, 0, 1);
+    resetState(emu_state);
+
+    emu_state->instr = instr;
+    decode(emu_state);
+
+    emu_state->rs1_dat = reg_read(emu_state->rs1);
+    emu_state->rs2_dat = reg_read(emu_state->rs2);
+
+    execute(emu_state);
+
+    if(emu_state->write)
+        reg_write(emu_state->rd, emu_state->rd_dat);
+
+    CU_ASSERT_EQUAL((int) reg_read(1), 1);
 }
 
 void decode_signed_test() {
@@ -98,6 +120,11 @@ int main() {
     }
 
     if(CU_add_test(pSuite, "decode_signed_test", decode_signed_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite, "execute_add_test", execute_add_test) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }

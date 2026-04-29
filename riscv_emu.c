@@ -103,6 +103,8 @@ void emu_cycle(EmulatorState* state)
 
 void emu_exit(EmulatorState* state)
 {
-  free(state->mem);
-  free(state);
+  if(state->mem)
+    free(state->mem);
+  if(state)
+    free(state);
 }
