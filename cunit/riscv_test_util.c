@@ -5,26 +5,27 @@
 // WELCOME TO HELL!
 
 #include <stdint.h>
+#include <time.h>
 #include "../riscv_emu.h"
 
 #ifndef RISCV_TEST_UTIL
 #define RISCV_TEST_UTIL
 
 // silently clamping immediate values for random test inputs
-#define RISCV_I_TYPE_MAX ((2**12) / 2) -1
-#define RISCV_I_TYPE_MIN -((2**12) / 2)
+#define RISCV_I_TYPE_MAX ((2^12) / 2) -1
+#define RISCV_I_TYPE_MIN -((2^12) / 2)
 
-#define RISCV_S_TYPE_MAX ((2**12) / 2) -1
-#define RISCV_S_TYPE_MIN -((2**12) / 2)
+#define RISCV_S_TYPE_MAX ((2^12) / 2) -1
+#define RISCV_S_TYPE_MIN -((2^12) / 2)
 
-#define RISCV_B_TYPE_MAX ((2**13) / 2) -1
-#define RISCV_B_TYPE_MIN -((2**13) / 2)
+#define RISCV_B_TYPE_MAX ((2^13) / 2) -1
+#define RISCV_B_TYPE_MIN -((2^13) / 2)
 
-#define RISCV_U_TYPE_MAX ((2**32) / 2) -1
-#define RISCV_U_TYPE_MIN -((2**32) / 2)
+#define RISCV_U_TYPE_MAX ((2^32) / 2) -1
+#define RISCV_U_TYPE_MIN -((2^32) / 2)
 
-#define RISCV_J_TYPE_MAX ((2**21) / 2) -1
-#define RISCV_J_TYPE_MIN -((2**21) / 2)
+#define RISCV_J_TYPE_MAX ((2^21) / 2) -1
+#define RISCV_J_TYPE_MIN -((2^21) / 2)
 
 // masks and shifts for immediates
 #define RISCV_MASK_I_11_0       0x00000FFF
@@ -378,6 +379,71 @@ uint32_t built_instr(enum Opcode opcode, int32_t imm, uint32_t rs2, uint32_t rs1
             break;
     }
     return instr;
+}
+
+int32_t rand_imm(int32_t min, int32_t max) {
+    unsigned int seed = time(0);
+    return (int32_t) rand_r(&seed) % (max - min + 1) + min;
+}
+// i s b u j
+int32_t rand_i_imm() {
+    return rand_imm(RISCV_I_TYPE_MIN, RISCV_I_TYPE_MAX);
+}
+
+int32_t rand_s_imm() {
+    return rand_imm(RISCV_S_TYPE_MIN, RISCV_S_TYPE_MAX);
+}
+
+int32_t rand_b_imm() {
+    return rand_imm(RISCV_B_TYPE_MIN, RISCV_B_TYPE_MAX);
+}
+
+int32_t rand_u_imm() {
+    return rand_imm(RISCV_U_TYPE_MIN, RISCV_U_TYPE_MAX);
+}
+
+int32_t rand_j_imm() {
+    return rand_imm(RISCV_J_TYPE_MIN, RISCV_J_TYPE_MAX);
+}
+
+int32_t clamp_i_imm(int32_t imm) {
+    if(imm > RISCV_I_TYPE_MAX)
+        imm = RISCV_I_TYPE_MAX;
+    if(imm < RISCV_I_TYPE_MIN)
+        imm = RISCV_I_TYPE_MIN;
+    return imm;
+}
+
+int32_t clamp_s_imm(int32_t imm) {
+    if(imm > RISCV_S_TYPE_MAX)
+        imm = RISCV_S_TYPE_MAX;
+    if(imm < RISCV_S_TYPE_MIN)
+        imm = RISCV_S_TYPE_MIN;
+    return imm;
+}
+
+int32_t clamp_b_imm(int32_t imm) {
+    if(imm > RISCV_B_TYPE_MAX)
+        imm = RISCV_B_TYPE_MAX;
+    if(imm < RISCV_B_TYPE_MIN)
+        imm = RISCV_B_TYPE_MIN;
+    return imm;
+}
+
+int32_t clamp_u_imm(int32_t imm) {
+    if(imm > RISCV_U_TYPE_MAX)
+        imm = RISCV_U_TYPE_MAX;
+    if(imm < RISCV_U_TYPE_MIN)
+        imm = RISCV_U_TYPE_MIN;
+    return imm;
+}
+
+int32_t clamp_j_imm(int32_t imm) {
+    if(imm > RISCV_J_TYPE_MAX)
+        imm = RISCV_J_TYPE_MAX;
+    if(imm < RISCV_J_TYPE_MIN)
+        imm = RISCV_J_TYPE_MIN;
+    return imm;
 }
 
 #endif

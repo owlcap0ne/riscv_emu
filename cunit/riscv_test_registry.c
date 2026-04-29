@@ -9,6 +9,8 @@
 #include "../riscv_decode.h"
 #include "../riscv_regfile.h"
 #include "../riscv_execute.h"
+#include "../riscv_memory.h"
+#include "../riscv_ui.h"
 #include "riscv_test_util.c"
 
 #define ROOT_NAME "Test-Init"
@@ -59,6 +61,38 @@ void decode_nop_test() {
     CU_ASSERT_EQUAL(emu_state->imm, 0);
     CU_ASSERT_EQUAL(emu_state->rs1, 0);
     CU_ASSERT_EQUAL(emu_state->rd, 0);
+}
+
+void test_util_execute(EmulatorState* state, uint32_t instr) {
+    resetState(state);
+
+    state->instr = instr;
+    decode(state);
+
+    state->rs1_dat = reg_read(state->rs1);
+    state->rs2_dat = reg_read(state->rs2);
+
+    execute(state);
+
+    if(state->memory)
+        if(memory(state))
+        {
+        fprintf(stderr, "Memory Error @ %x, Op = %s, PC = %x\n", state->mem_addr,
+              OpcodeS[state->op], state->pc);
+        }
+
+    if(state->write)
+        reg_write(state->rd, state->rd_dat);
+}
+
+void addi_rand_test() {
+    for(int i = 0; i < 5; i++) {
+        int32_t imm = rand_i_imm();
+        uint32_t instr = built_instr(ADDI, imm, 0, 0, 1);
+        reg_reset();
+        test_util_execute(emu_state, instr);
+        CU_ASSERT_EQUAL((int32_t) reg_read(1), imm);
+    }
 }
 
 void execute_add_test() {
@@ -125,6 +159,11 @@ int main() {
     }
 
     if(CU_add_test(pSuite, "execute_add_test", execute_add_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite, "addi_rand_test", addi_rand_test) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }

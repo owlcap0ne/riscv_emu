@@ -296,5 +296,4 @@ void decode(EmulatorState *state){
         if(func3 == 0)
             _op = ADDI;
     }
-    return;
 }
