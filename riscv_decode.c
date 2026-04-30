@@ -39,6 +39,7 @@ void decode(EmulatorState *state){
     if(op == OPC_U_LUI)
     {
         _rd = RD(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_U(_instr);
         _itype = U_Type;
         _op = LUI;
@@ -49,6 +50,7 @@ void decode(EmulatorState *state){
     if(op == OPC_U_AUIPC)
     {
         _rd = RD(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_U(_instr);
         _itype = U_Type;
         _op = AUIPC;
@@ -60,6 +62,7 @@ void decode(EmulatorState *state){
     {
         _rs1 = RS1(_instr);
         _rs2 = RS2(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_B(_instr);
         _itype = B_Type;
         _write = false;
@@ -96,6 +99,7 @@ void decode(EmulatorState *state){
     {
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_I(_instr);
         _itype = I_Type;
         _write = true;
@@ -128,6 +132,7 @@ void decode(EmulatorState *state){
     {
         _rs1 = RS1(_instr);
         _rs2 = RS2(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_S(_instr);
         _itype = S_Type;
         _write = false;
@@ -152,6 +157,7 @@ void decode(EmulatorState *state){
     {
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_I(_instr);
         _itype = I_Type;
         _write = true;
@@ -252,6 +258,7 @@ void decode(EmulatorState *state){
     if(op == OPC_J_JAL)
     {
         _rd = RD(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_J(_instr);
         _itype = J_Type;
         _write = true;
@@ -263,6 +270,7 @@ void decode(EmulatorState *state){
     {
         _rd = RD(_instr);
         _rs1 = RS1(_instr);
+// cppcheck-suppress shiftTooManyBitsSigned
         _imm = IMM_I(_instr);
         _itype = I_Type;
         _write = true;

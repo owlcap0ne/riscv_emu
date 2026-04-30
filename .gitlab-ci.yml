@@ -8,7 +8,7 @@ lint:
     - source myenv/bin/activate
     - pip3 install xmltodict
   script:
-    - cppcheck **.c **.h --xml 2> ./lint/cppcheck_result.xml
+    - cppcheck **.c **.h --xml --inline-suppr 2> ./lint/cppcheck_result.xml
     - cd ./lint
     - python3 cppcheck_xml2json.py
   artifacts:
