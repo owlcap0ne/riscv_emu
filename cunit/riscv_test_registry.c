@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include "../riscv_emu.h"
 #include "../riscv_decode.h"
-#include "jumps_test.c"
 #include "riscv_test_util.c"
 
 // includes for testsuites go below
@@ -15,6 +14,7 @@ static EmulatorState* emu_state = NULL;
 
 #include "riscv_testsuite_inits.c"
 #include "riscv_testsuite_decode.c"
+#include "riscv_testsuite_jumps.c"
 
 #define ROOT_NAME "Test-Emulator"
 
@@ -130,12 +130,12 @@ int main() {
     if(CU_add_test(pSuite_jumps, "jumps_inc_pc_test", jumps_inc_pc_test) == NULL){
     CU_cleanup_registry();
     return CU_get_error();
-}
+    }
 
-if(CU_add_test(pSuite_jumps, "jumps_rand_jal_test", jumps_rand_jal_test) == NULL){
-    CU_cleanup_registry();
-    return CU_get_error();
-}
+    if(CU_add_test(pSuite_jumps, "jumps_rand_jal_test", jumps_rand_jal_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
 
     #ifdef TEST_AUTOMATIC
 
