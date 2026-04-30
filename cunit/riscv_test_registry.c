@@ -13,6 +13,7 @@ static EmulatorState* emu_state = NULL;
 #include "riscv_testsuite_dummy.c"
 
 #include "riscv_testsuite_inits.c"
+#include "riscv_testsuite_decode.c"
 
 #define ROOT_NAME "Test-Emulator"
 
@@ -29,6 +30,7 @@ int main() {
     */
 
     CU_pSuite pSuite_dummy = NULL;
+    CU_pSuite pSuite_decode = NULL;
 
     CU_pSuite pSuite_inits = NULL;
 
@@ -53,13 +55,21 @@ int main() {
         CU_cleanup_registry();
         return CU_get_error();
     }
+    pSuite_decode = CU_add_suite("decode_test_suite", init_suite_decode, clean_suite_decode);
+    if(pSuite_decode == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
     /*
     *   dummy_suite tests
     */
+
     if(CU_add_test(pSuite_dummy, "dummy_test", dummy_test) == NULL){
         CU_cleanup_registry();
         return CU_get_error();
     }
+
     if (CU_add_test(pSuite_inits, "init_state_test", init_state_test) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -71,6 +81,41 @@ int main() {
     }
 
     if (CU_add_test(pSuite_inits, "init_memory_test", init_memory_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+
+    /*
+    *   decode_suite tests
+    */
+
+    if(CU_add_test(pSuite_decode, "decode_nop_test", decode_nop_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite_decode, "decode_imm_negative_test", decode_imm_negative_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite_decode, "decode_imm_positive_test", decode_imm_positive_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite_decode, "decode_imm_posmax_test", decode_imm_posmax_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite_decode, "decode_imm_negmin_test", decode_imm_negmin_test) == NULL){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if(CU_add_test(pSuite_decode, "decode_imm_random_test", decode_imm_random_test) == NULL){
         CU_cleanup_registry();
         return CU_get_error();
     }
