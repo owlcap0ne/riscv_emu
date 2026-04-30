@@ -15,6 +15,7 @@ static EmulatorState* emu_state = NULL;
 #include "riscv_testsuite_inits.c"
 #include "riscv_testsuite_decode.c"
 #include "riscv_testsuite_jumps.c"
+#include "riscv_testsuite_execute.c"
 
 #define ROOT_NAME "Test-Emulator"
 
@@ -32,6 +33,7 @@ int main() {
     CU_pSuite pSuite_dummy = NULL;
     CU_pSuite pSuite_decode = NULL;
     CU_pSuite pSuite_jumps = NULL;
+	CU_pSuite pSuite_execute = NULL;
 
     CU_pSuite pSuite_inits = NULL;
 
@@ -62,11 +64,18 @@ int main() {
         return CU_get_error();
     }
 
+	pSuite_execute = CU_add_suite("execute_test_suite", init_suite_execute, clean_suite_execute);
+    if(pSuite_execute == NULL){
+    CU_cleanup_registry();
+    return CU_get_error();
+    }
+	
     pSuite_jumps = CU_add_suite("jumps_test_suite", init_suite_jumps, clean_suite_jumps);
     if(pSuite_jumps == NULL){
     CU_cleanup_registry();
     return CU_get_error();
     }
+	
 
     /*
     *   dummy_suite tests
@@ -127,6 +136,22 @@ int main() {
         return CU_get_error();
     }
 
+	/*
+    *   execute_suite tests
+    */
+	if(CU_add_test(pSuite_execute, "execute_addi_rand_test", execute_addi_rand_test) == NULL){
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+	
+	if(CU_add_test(pSuite_execute, "execute_add_rand_test", execute_add_rand_test) == NULL){
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+
+	/*
+    *   jump_suite tests
+    */
     if(CU_add_test(pSuite_jumps, "jumps_inc_pc_test", jumps_inc_pc_test) == NULL){
     CU_cleanup_registry();
     return CU_get_error();
