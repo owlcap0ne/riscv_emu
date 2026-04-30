@@ -68,6 +68,27 @@ int main() {
     }
 
     /*
+    *   init_suite tests
+    */
+    
+    if (CU_add_test(pSuite_inits, "init_state_test", init_state_test) == NULL) {
+    CU_cleanup_registry();
+    return CU_get_error();
+    }
+
+    if (CU_add_test(pSuite_inits, "init_regs_test", init_regs_test) == NULL) {
+    CU_cleanup_registry();
+    return CU_get_error();
+    }
+
+    if (CU_add_test(pSuite_inits, "init_memory_test", init_memory_test) == NULL) {
+    CU_cleanup_registry();
+    return CU_get_error();
+    }
+
+
+
+    /*
     *   decode_suite tests
     */
 
