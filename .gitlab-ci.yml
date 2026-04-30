@@ -44,7 +44,7 @@ build_main:
     - apt-get update && apt-get install -y libcunit1-dev libncurses-dev
   script:
     - make
-    - makedir bin
+    - mkdir bin
     - mv riscv_emu.bin bin/
   artifacts:
     paths:
