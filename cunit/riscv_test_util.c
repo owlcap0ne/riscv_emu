@@ -3,7 +3,7 @@
 // immediate bits to their correct locations
 //
 // WELCOME TO HELL!
-
+#include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
 #include "../riscv_emu.h"
@@ -396,7 +396,8 @@ uint32_t built_instr(enum Opcode opcode, int32_t imm, uint32_t rs2, uint32_t rs1
 
 int32_t rand_imm(int32_t min, int32_t max) {
     unsigned int seed = time(0);
-    return (int32_t) rand_r(&seed) % (max - min + 1) + min;
+    srand(seed);
+    return (int32_t) rand() % (max - min + 1) + min;
 }
 // i s b u j
 int32_t rand_i_imm() {
