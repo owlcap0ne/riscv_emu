@@ -3,7 +3,7 @@ usage:
 ```bash
 ./riscv_emu.bin program.hex
 ```
-where `program.hex` is expected to be an [Intel HEX (wiki)](https://en.wikipedia.org/wiki/Intel_HEX) binary compiled for the RV32I instruction set.
+where `program.hex` is expected to be an [Intel HEX (wiki)](https://en.wikipedia.org/wiki/Intel_HEX) binary compiled for the [RV32I (spec)](https://docs.riscv.org/reference/isa/unpriv/rv32.html) instruction set.
 
 ## UI Controls
 F9 - step<br>
