@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "../riscv_emu.h"
 #include "../riscv_decode.h"
+#include "jumps_test.c"
 #include "riscv_test_util.c"
 
 // includes for testsuites go below
@@ -30,6 +31,7 @@ int main() {
 
     CU_pSuite pSuite_dummy = NULL;
     CU_pSuite pSuite_decode = NULL;
+    CU_pSuite pSuite_jumps = NULL;
 
     CU_pSuite pSuite_inits = NULL;
 
@@ -58,6 +60,12 @@ int main() {
     if(pSuite_decode == NULL){
         CU_cleanup_registry();
         return CU_get_error();
+    }
+
+    pSuite_jumps = CU_add_suite("jumps_test_suite", init_suite_jumps, clean_suite_jumps);
+    if(pSuite_jumps == NULL){
+    CU_cleanup_registry();
+    return CU_get_error();
     }
 
     /*
@@ -118,6 +126,16 @@ int main() {
         CU_cleanup_registry();
         return CU_get_error();
     }
+
+    if(CU_add_test(pSuite_jumps, "jumps_inc_pc_test", jumps_inc_pc_test) == NULL){
+    CU_cleanup_registry();
+    return CU_get_error();
+}
+
+if(CU_add_test(pSuite_jumps, "jumps_rand_jal_test", jumps_rand_jal_test) == NULL){
+    CU_cleanup_registry();
+    return CU_get_error();
+}
 
     #ifdef TEST_AUTOMATIC
 
