@@ -21,7 +21,6 @@ static EmulatorState* emu_state = NULL;
 #define TESTING
 #define TEST_AUTOMATIC
 
-
 #ifdef TESTING
 int main() {
 
