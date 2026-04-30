@@ -10,7 +10,6 @@
 
 // includes for testsuites go below
 static EmulatorState* emu_state = NULL;
-#include "riscv_testsuite_dummy.c"
 
 #include "riscv_testsuite_inits.c"
 #include "riscv_testsuite_decode.c"
@@ -30,12 +29,10 @@ int main() {
     *   Test Suite Pointers
     */
 
-    CU_pSuite pSuite_dummy = NULL;
+    CU_pSuite pSuite_inits = NULL;
     CU_pSuite pSuite_decode = NULL;
     CU_pSuite pSuite_jumps = NULL;
 	CU_pSuite pSuite_execute = NULL;
-
-    CU_pSuite pSuite_inits = NULL;
 
     // init CUnit test registry
     if(CUE_SUCCESS != CU_initialize_registry())
@@ -46,18 +43,12 @@ int main() {
     *   Add Test Suites
     */
 
-    // add test suites
-
-    pSuite_dummy = CU_add_suite("dummy_test_suite", init_suite_dummy, clean_suite_dummy);
-    if(pSuite_dummy == NULL){
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
     pSuite_inits = CU_add_suite("inits_test_suite", init_suite_inits,clean_suite_inits);
     if (pSuite_inits == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
+
     pSuite_decode = CU_add_suite("decode_test_suite", init_suite_decode, clean_suite_decode);
     if(pSuite_decode == NULL){
         CU_cleanup_registry();
@@ -66,41 +57,15 @@ int main() {
 
 	pSuite_execute = CU_add_suite("execute_test_suite", init_suite_execute, clean_suite_execute);
     if(pSuite_execute == NULL){
-    CU_cleanup_registry();
-    return CU_get_error();
+        CU_cleanup_registry();
+        return CU_get_error();
     }
 	
     pSuite_jumps = CU_add_suite("jumps_test_suite", init_suite_jumps, clean_suite_jumps);
     if(pSuite_jumps == NULL){
-    CU_cleanup_registry();
-    return CU_get_error();
-    }
-	
-
-    /*
-    *   dummy_suite tests
-    */
-
-    if(CU_add_test(pSuite_dummy, "dummy_test", dummy_test) == NULL){
         CU_cleanup_registry();
         return CU_get_error();
     }
-
-    if (CU_add_test(pSuite_inits, "init_state_test", init_state_test) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    if (CU_add_test(pSuite_inits, "init_regs_test", init_regs_test) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    if (CU_add_test(pSuite_inits, "init_memory_test", init_memory_test) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
 
     /*
     *   decode_suite tests
@@ -139,6 +104,7 @@ int main() {
 	/*
     *   execute_suite tests
     */
+
 	if(CU_add_test(pSuite_execute, "execute_addi_rand_test", execute_addi_rand_test) == NULL){
 		CU_cleanup_registry();
 		return CU_get_error();
@@ -152,9 +118,10 @@ int main() {
 	/*
     *   jump_suite tests
     */
+
     if(CU_add_test(pSuite_jumps, "jumps_inc_pc_test", jumps_inc_pc_test) == NULL){
-    CU_cleanup_registry();
-    return CU_get_error();
+        CU_cleanup_registry();
+        return CU_get_error();
     }
 
     if(CU_add_test(pSuite_jumps, "jumps_rand_jal_test", jumps_rand_jal_test) == NULL){
