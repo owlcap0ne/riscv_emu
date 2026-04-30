@@ -7,9 +7,22 @@
 #include <stdint.h>
 #include <time.h>
 #include "../riscv_emu.h"
+#include "../riscv_decode.h"
+#include "../riscv_regfile.h"
+#include "../riscv_execute.h"
+#include "../riscv_memory.h"
+#include "../riscv_ui.h"
 
 #ifndef RISCV_TEST_UTIL
 #define RISCV_TEST_UTIL
+
+typedef struct {
+    enum Opcode op;
+    enum IType itype;
+    uint32_t funct7;
+    uint32_t funct3;
+    uint32_t opcode;
+} op_encode_t;
 
 // silently clamping immediate values for random test inputs
 #define RISCV_I_TYPE_MAX ((2^12) / 2) -1
@@ -444,6 +457,28 @@ int32_t clamp_j_imm(int32_t imm) {
     if(imm < RISCV_J_TYPE_MIN)
         imm = RISCV_J_TYPE_MIN;
     return imm;
+}
+
+void test_util_execute(EmulatorState* state, uint32_t instr) {
+    resetState(state);
+
+    state->instr = instr;
+    decode(state);
+
+    state->rs1_dat = reg_read(state->rs1);
+    state->rs2_dat = reg_read(state->rs2);
+
+    execute(state);
+
+    if(state->memory)
+        if(memory(state))
+        {
+        fprintf(stderr, "Memory Error @ %x, Op = %s, PC = %x\n", state->mem_addr,
+              OpcodeS[state->op], state->pc);
+        }
+
+    if(state->write)
+        reg_write(state->rd, state->rd_dat);
 }
 
 #endif
