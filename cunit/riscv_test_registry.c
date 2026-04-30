@@ -12,6 +12,8 @@
 static EmulatorState* emu_state = NULL;
 #include "riscv_testsuite_dummy.c"
 
+#include "riscv_testsuite_inits.c"
+
 #define ROOT_NAME "Test-Emulator"
 
 #define MEM_SIZE 0x10000
@@ -27,6 +29,8 @@ int main() {
     */
 
     CU_pSuite pSuite_dummy = NULL;
+
+    CU_pSuite pSuite_inits = NULL;
 
     // init CUnit test registry
     if(CUE_SUCCESS != CU_initialize_registry())
@@ -44,7 +48,11 @@ int main() {
         CU_cleanup_registry();
         return CU_get_error();
     }
-
+    pSuite_inits = CU_add_suite("inits_test_suite", init_suite_inits,clean_suite_inits);
+    if (pSuite_inits == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
     /*
     *   dummy_suite tests
     */
@@ -52,7 +60,20 @@ int main() {
         CU_cleanup_registry();
         return CU_get_error();
     }
+    if (CU_add_test(pSuite_inits, "init_state_test", init_state_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
 
+    if (CU_add_test(pSuite_inits, "init_regs_test", init_regs_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if (CU_add_test(pSuite_inits, "init_memory_test", init_memory_test) == NULL) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
 
     #ifdef TEST_AUTOMATIC
 
