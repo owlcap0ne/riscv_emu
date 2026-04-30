@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -std=c23
 LIBS = -lncurses
 SRCS = riscv_main.c riscv_emu.c riscv_pc.c riscv_ui.c riscv_fetch.c riscv_decode.c riscv_memory.c riscv_execute.c riscv_hexread.c riscv_regfile.c
 OBJS = $(SRCS: .c=.o)
