@@ -5,6 +5,8 @@
 !.gitignore
 !*.hex
 !*.S
+!Readme.md
+!*.md
 !tests/
 /tests/*
 !tests/*.lds
@@ -12,12 +14,15 @@
 !tests/*.c
 !tests/*.hex
 !tests/Makefile
+!tests/*.md
 !cunit/
 /cunit/*
 !cunit/*.c
 !cunit/*.h
 !cunit/Makefile
+!cunit/*.md
 !.gitlab-ci.yml
 !lint/
 /lint/*
 !lint/*.py
+!lint/*.md
