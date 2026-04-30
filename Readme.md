@@ -16,13 +16,14 @@ F1 - exit<br>
 ## Building the Emulator
 ### Dependencies
 The UI is implemented with `ncurses`.
-To compile the test cases `cunit` is required.
+To compile the test cases `cunit` is required.<br>
+<br>
+Debian, Ubuntu:
 ```bash
-# Debian, Ubuntu
 apt-get update && apt-get install -y libcunit1-dev libncurses-dev
 ```
+Arch:
 ```bash
-# Arch
 pacman -Sy cunit ncurses
 ```
 ### Build Emulator & Build Tests
