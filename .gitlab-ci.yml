@@ -1,3 +1,7 @@
+stages:
+ - test
+ - build
+
 lint:
   stage: test
   image: gcc:latest
@@ -32,3 +36,16 @@ cunit_test:
       - ./cunit/Test-*-Results.xml
     reports:
       junit: ./cunit/Test-*-Results.xml
+
+build_main:
+  stage: build
+  image: gcc:latest
+  before_script:
+    - apt-get update && apt-get install -y libcunit1-dev libncurses-dev
+  script:
+    - make
+    - makedir bin
+    - mv riscv_emu.bin bin/
+  artifacts:
+    paths:
+      - bin
